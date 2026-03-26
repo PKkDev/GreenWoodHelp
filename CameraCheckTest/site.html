@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Яндекс Карта</title>
+    <script src="https://api-maps.yandex.ru/v3/?apikey=22ccc084-055d-4abd-933d-2d29a9ee787b&lang=ru_RU"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+
+        window.map = null;
+
+        initMap();
+
+        async function initMap() {
+            // Промис `ymaps3.ready` будет зарезолвлен, когда загрузятся все компоненты основного модуля API
+            await ymaps3.ready;
+            const {
+                YMap,
+                YMapDefaultSchemeLayer,
+                YMapFeatureDataSource,
+                YMapLayer,
+                YMapFeature,
+                YMapListener,
+                YMapDefaultFeaturesLayer,
+                YMapMarker,
+                YMapCollection
+            } = ymaps3;
+
+            map = new YMap(
+                document.getElementById('map'),
+                {
+                    location: {
+                        center: [49.340300, 53.526747],
+                        zoom: 18
+                    },
+                    showScaleInCopyrights: false
+                }, [
+                new YMapDefaultSchemeLayer(),
+                new YMapFeatureDataSource({ id: 'featureSource', dynamic: false }),
+                new YMapLayer({ type: 'features', source: 'featureSource', zIndex: 1400 }),
+            ]
+            );
+
+
+
+            const listener = new YMapListener({
+                onClick: (object) => {
+                    console.log(object);
+                }
+            });
+
+            map.addChild(listener);
+        }
+
+        setTimeout(() => {
+            const polygonFeature = new ymaps3.YMapFeature({
+                id: 'polygon',
+                source: 'featureSource',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [
+                        [
+                            [49.341356, 53.527598],
+                            [49.341431, 53.527529],
+                            [49.341258, 53.527572]
+                        ]
+                    ]
+                },
+                style: {
+                    stroke: [{ width: 2, color: '#3bb300' }],
+                    fill: '#f43'
+                }
+            });
+
+            map.addChild(polygonFeature);
+        }, 1000 * 1)
+
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../ObjectDetection/YOLO26.Shared/YOLO26.Shared.csproj" />
+  <Project Path="CameraCheckTest/CameraCheckTest.csproj" />
+</Solution>
