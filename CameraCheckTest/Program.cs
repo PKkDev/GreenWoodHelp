@@ -25,7 +25,7 @@ namespace CameraCheckTest
         static void Main(string[] args)
         {
             //StartSaveCameraView();
-            StartSaveCameraViewV2();
+            //StartSaveCameraViewV2();
             StartSaveParking();
         }
 
@@ -186,6 +186,8 @@ namespace CameraCheckTest
             parser.Load("p28", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p28.json"));
             parser.Load("p22", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p22.json"));
             parser.Load("p21", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p21.json"));
+            parser.Load("p15", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p15.json"));
+            parser.Load("p16", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p16.json"));
 
             System.IO.DirectoryInfo diImages = new DirectoryInfo(pathToScreenFolder);
             var folders = diImages.GetDirectories();
