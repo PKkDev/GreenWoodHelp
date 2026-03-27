@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ParkingSignalRService } from './parking-signalR.service';
 
 const ymaps3: typeof import('@yandex/ymaps3-types') = (window as any).ymaps3;
 const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapDefaultFeaturesLayer, YMapFeatureDataSource, YMapLayer } = ymaps3;
@@ -16,10 +17,14 @@ export class App implements AfterViewInit {
   private mapContainer = viewChild.required<ElementRef<HTMLDivElement>>('mapContainer');
   private map = signal<any>(null);
 
+  constructor(private readonly parkingSignalRService: ParkingSignalRService) { }
+
   public ngAfterViewInit() {
     this.title.set('green-wood-parking-ui');
 
     this.initMap().then(() => this.addAllParking());
+
+    this.parkingSignalRService.startConnection();
   }
 
   private async initMap() {
@@ -161,8 +166,10 @@ export class App implements AfterViewInit {
         coordinates: coordinates
       },
       style: {
-        stroke: [{ width: 2, color: '#3bb300' }],
-        fill: '#f43'
+        stroke: [{ width: 2, color: '#eee' }],
+        fill: 'rgb(144, 132, 131)'
+        // fill: '#f43'
+        // fill: '#3bb300'
       }
     });
   }

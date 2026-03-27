@@ -18,7 +18,6 @@ namespace CameraCheckTest
         public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\cameraview";
         public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\parkingview";
         public static List<string> needIds = new List<string>() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
-        // public static List<string> needIds = new List<string>() { "p31", "p30" };
         public static string url = "https://gw.videosreda.ru";
         public static string playlist = "playlist.m3u8";
 
@@ -188,6 +187,8 @@ namespace CameraCheckTest
             parser.Load("p21", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p21.json"));
             parser.Load("p15", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p15.json"));
             parser.Load("p16", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p16.json"));
+            parser.Load("p13", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p13.json"));
+            parser.Load("p14", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p14.json"));
 
             System.IO.DirectoryInfo diImages = new DirectoryInfo(pathToScreenFolder);
             var folders = diImages.GetDirectories();

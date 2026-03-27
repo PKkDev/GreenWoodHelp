@@ -76,6 +76,12 @@
     <None Update="Files\ffmpeg\swscale-9.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Files\p13.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Files\p14.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Files\p15.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
