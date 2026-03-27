@@ -118,7 +118,7 @@ namespace CameraCheckTest
                 if (!Directory.Exists(pathToScreenFolderCamera))
                     Directory.CreateDirectory(pathToScreenFolderCamera);
 
-                GetFrameFromCamera(camera, pathToScreenFolderCamera, 0, 3);
+                GetFrameFromCamera(camera, pathToScreenFolderCamera, 0, 4);
             }
         }
 
