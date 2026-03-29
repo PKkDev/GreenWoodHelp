@@ -19,8 +19,7 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "files": [],
-  "types": ["@yandex/ymaps3-types"],
+  "files": [], 
   "references": [
     {
       "path": "./tsconfig.app.json"

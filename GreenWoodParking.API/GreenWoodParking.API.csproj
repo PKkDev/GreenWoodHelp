@@ -61,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ObjectDetection\YOLO26.Shared\YOLO26.Shared.csproj" />
+    <ProjectReference Include="..\GreenWoodParking.Shared\GreenWoodParking.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

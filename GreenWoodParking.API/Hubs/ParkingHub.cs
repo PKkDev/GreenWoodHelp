@@ -19,7 +19,7 @@ namespace GreenWoodParking.API.Hubs
         public async Task GetParkingData(ParkingService parkingService)
         {
             parkingService.StartWorkForuser(Context.ConnectionId);
-            await Clients.Caller.SendAsync("ReceiveStatus", "Работа завершена");
+            await Clients.Caller.SendAsync("ReceiveWorkStatus", "Работа завершена");
         }
     }
 }

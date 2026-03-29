@@ -1,16 +1,20 @@
 import { Injectable, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import * as signalR from '@microsoft/signalr';
+import { ParkingSlotDto } from './parking-slot-dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParkingSignalRService {
 
-  // Сигнал со списком мест. Карта будет "слушать" его автоматически.
-  public slots = signal<any[]>([]);
-  private hubConnection!: signalR.HubConnection;
+  private receivedStatus = signal<any>(null);
+  public receivedStatus$ = toObservable(this.receivedStatus);
 
-  constructor() { }
+  private receiveParkingData = signal<ParkingSlotDto | null>(null);
+  public receiveParkingData$ = toObservable(this.receiveParkingData);
+
+  private hubConnection!: signalR.HubConnection;
 
   public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -27,9 +31,12 @@ export class ParkingSignalRService {
       .catch(err => console.error('SignalR Error: ', err));
 
     // Слушаем событие от бэкенда
-    this.hubConnection.on('ReceiveStatus', (data: any) => {
-      console.log('ReceiveStatus', data);
-      // this.slots.set(data);
+    this.hubConnection.on('ReceiveWorkStatus', (data: any) => {
+      this.receivedStatus.set(data);
+    });
+
+    this.hubConnection.on('ReceiveParkingData', (data: ParkingSlotDto) => {
+      this.receiveParkingData.set(data);
     });
   }
 
