@@ -153,7 +153,7 @@ public static class Yolo26ServiceHelper
         int pointsInsidePolygon = 0;
         int pointsCoveredByCar = 0;
 
-        float step = 12f;
+        float step = 9f;
         for (float x = minX; x <= maxX; x += step)
         {
             for (float y = minY; y <= maxY; y += step)

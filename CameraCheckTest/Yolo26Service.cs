@@ -282,7 +282,7 @@ namespace ObjectDetection.WinApp.Services
                     int occupiedPoints = 0;
 
                     // Шаг сетки (чем меньше, тем точнее, но медленнее)
-                    float step = 12f;
+                    float step = 9f;
 
                     // Сканируем область
                     for (float x = minX; x <= maxX; x += step)
@@ -366,7 +366,7 @@ namespace ObjectDetection.WinApp.Services
                     float maxY = space.Points.Max(p => p.Y);
 
                     // Шаг сетки (чем меньше, тем точнее, но медленнее)
-                    float step = 12f;
+                    float step = 9f;
 
                     // Сканируем область
                     for (float x = minX; x <= maxX; x += step)

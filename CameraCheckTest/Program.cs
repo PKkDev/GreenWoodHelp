@@ -24,7 +24,7 @@ namespace CameraCheckTest
         static void Main(string[] args)
         {
             //StartSaveCameraView();
-            //StartSaveCameraViewV2();
+            StartSaveCameraViewV2();
             StartSaveParking();
         }
 
@@ -140,14 +140,14 @@ namespace CameraCheckTest
                 var buffer = new byte[file.Video.FrameByteCount];
                 var bmp = Image.WrapMemory<Bgr24>(buffer, file.Video.Info.FrameSize.Width, file.Video.Info.FrameSize.Height);
 
-                var startTime = DateTime.Now;
-                double skipSeconds = 1.0;
-                Console.WriteLine($"Ждём: {skipSeconds} сек.");
-                while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
-                {
-                    if (!file.Video.TryGetNextFrame(buffer)) break;
-                }
-                Console.WriteLine($"Берём кадр");
+                //var startTime = DateTime.Now;
+                //double skipSeconds = 1.0;
+                //Console.WriteLine($"Ждём: {skipSeconds} сек.");
+                //while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
+                //{
+                //    if (!file.Video.TryGetNextFrame(buffer)) break;
+                //}
+                //Console.WriteLine($"Берём кадр");
 
                 file.Video.TryGetNextFrame(buffer);
                 var filename = $"{DateTime.Now:yyyyMMddHHmmss}.png";

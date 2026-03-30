@@ -4,6 +4,7 @@ import { ParkingSignalRService } from './parking-signalR.service';
 import { ParkingSlotDto } from './parking-slot-dto';
 import { parkingSLots } from './parking-slots';
 
+import { HttpClient } from '@angular/common/http';
 import type { YMapFeature as YMapFeatureType } from '@yandex/ymaps3-types';
 const ymaps3: typeof import('@yandex/ymaps3-types') = (window as any).ymaps3;
 const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
@@ -22,8 +23,11 @@ export class App implements AfterViewInit {
 
   private parkingSlotMap = new Map<string, number[][][]>();
   private featureMap = new Map<string, YMapFeatureType>();
+  private parkingSlotResponse = new Map<string, ParkingSlotDto>();
 
-  constructor(private readonly parkingSignalRService: ParkingSignalRService) {
+  constructor(
+    private readonly parkingSignalRService: ParkingSignalRService,
+    private readonly httpClient: HttpClient) {
     this.parkingSlotMap.set('p29', parkingSLots['p29']);
     this.parkingSlotMap.set('p28', parkingSLots['p28']);
     this.parkingSlotMap.set('p30', parkingSLots['p30']);
@@ -70,7 +74,16 @@ export class App implements AfterViewInit {
 
     const listener = new YMapListener({
       onClick: (object: any) => {
-        console.log(object);
+        const actualResult = this.parkingSlotResponse.get(object.entity.id);
+        if (actualResult) {
+          this.httpClient.get(`https://localhost:7196/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
+            .subscribe({
+              next: (value) => {
+                console.log(value)
+              },
+              error: (err) => console.error(err),
+            })
+        }
       }
     });
 
@@ -115,6 +128,8 @@ export class App implements AfterViewInit {
     if (!slot) {
       return
     }
+
+    this.parkingSlotResponse.set(slot.id, slot);
 
     if (this.featureMap.has(slot.id)) {
       const feature = this.featureMap.get(slot.id);

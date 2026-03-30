@@ -26,7 +26,7 @@ namespace GreenWoodParking.API
 
             builder.Services.AddSignalR();
 
-            builder.Services.AddHttpClient();
+            builder.Services.AddHttpClient("CameraDataClient").AddHttpMessageHandler<RetryHandler>();
 
             builder.Services.AddScoped<ParkingService>();
             builder.Services.AddScoped<Yolo26Service>();

@@ -14,7 +14,7 @@ export class ParkingSignalRService {
   private receiveParkingData = signal<ParkingSlotDto | null>(null);
   public receiveParkingData$ = toObservable(this.receiveParkingData);
 
-  private hubConnection!: signalR.HubConnection;
+  public hubConnection!: signalR.HubConnection;
 
   public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
