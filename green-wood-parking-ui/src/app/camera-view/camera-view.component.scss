@@ -1,0 +1,13 @@
+.image-viewer {
+  position: relative;
+  background-color: #2c2c2c; /* Темный фон уберет визуальный эффект "белых полей" */
+  line-height: 0; /* Убирает микро-отступ под изображением */
+}
+
+.parking-frame {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 95vh;
+}

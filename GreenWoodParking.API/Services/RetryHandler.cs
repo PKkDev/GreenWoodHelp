@@ -2,9 +2,7 @@
 {
     public class RetryHandler : DelegatingHandler
     {
-        private const int MaxRetries = 3;
-
-        public RetryHandler(HttpMessageHandler innerHandler) : base(innerHandler) { }
+        private const int MaxRetries = 3; 
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,

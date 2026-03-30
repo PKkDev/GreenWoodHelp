@@ -1,17 +1,20 @@
-import { AfterViewInit, Component, ElementRef, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ParkingSignalRService } from './parking-signalR.service';
 import { ParkingSlotDto } from './parking-slot-dto';
 import { parkingSLots } from './parking-slots';
 
 import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import type { YMapFeature as YMapFeatureType } from '@yandex/ymaps3-types';
+import { CameraViewComponent } from './camera-view/camera-view.component';
 const ymaps3: typeof import('@yandex/ymaps3-types') = (window as any).ymaps3;
 const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, MatSnackBarModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -24,6 +27,9 @@ export class App implements AfterViewInit {
   private parkingSlotMap = new Map<string, number[][][]>();
   private featureMap = new Map<string, YMapFeatureType>();
   private parkingSlotResponse = new Map<string, ParkingSlotDto>();
+
+  private readonly dialog = inject(MatDialog);
+  private readonly _snackBar = inject(MatSnackBar);
 
   constructor(
     private readonly parkingSignalRService: ParkingSignalRService,
@@ -49,6 +55,11 @@ export class App implements AfterViewInit {
 
     this.parkingSignalRService.receivedStatus$.subscribe((data: string) => {
       console.log('ReceiveWorkStatus', data);
+      this._snackBar.open(data, 'Close', {
+        duration: 2000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right'
+      });
     });
 
     this.parkingSignalRService.receiveParkingData$.subscribe((data: ParkingSlotDto | null) => {
@@ -74,12 +85,22 @@ export class App implements AfterViewInit {
 
     const listener = new YMapListener({
       onClick: (object: any) => {
+        if (!object) {
+          return
+        }
+
         const actualResult = this.parkingSlotResponse.get(object.entity.id);
         if (actualResult) {
           this.httpClient.get(`https://localhost:7196/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
             .subscribe({
               next: (value) => {
                 console.log(value)
+                this.dialog.open(CameraViewComponent, {
+                  maxWidth: '95vw',
+                  maxHeight: '95vh',
+                  panelClass: 'full-screen-modal', // Кастомный класс для стилей
+                  data: { file: value }
+                });
               },
               error: (err) => console.error(err),
             })

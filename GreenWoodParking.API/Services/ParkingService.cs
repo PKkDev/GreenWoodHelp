@@ -18,8 +18,8 @@ namespace GreenWoodParking.API.Services
         private readonly IHubContext<ParkingHub> _hubContext;
         private readonly Yolo26Service _yolo26Service;
 
-        // private readonly List<string> needIds = new() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
-        private readonly List<string> needIds = new() { "p29" };
+        private readonly List<string> needIds = new() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
+        //  private readonly List<string> needIds = new() { "p29" };
         private readonly string url = "https://gw.videosreda.ru";
         private readonly string playlist = "playlist.m3u8";
 
