@@ -1,13 +1,3 @@
-<!-- <mat-dialog-content>
-  @if (imagePath) {
-    <img [src]="imagePath" alt="Загруженное изображение" />
-  }
-</mat-dialog-content>
-
-<mat-dialog-actions>
-  <button matButton mat-dialog-close cdkFocusInitial>Close</button>
-</mat-dialog-actions> -->
-
 <div class="image-viewer">
   @if (imagePath) {
     <img class="parking-frame" [src]="imagePath" alt="Parking Stream" (click)="onClose()" />

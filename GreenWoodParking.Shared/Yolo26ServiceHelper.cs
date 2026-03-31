@@ -22,7 +22,7 @@ public static class Yolo26ServiceHelper
         // Порог в 50 пикселей можно подстроить под ваше разрешение
         bool isCenterClose = distance < 50f;
         bool hasEnoughPoints = pointsInside >= 1; // 2
-        bool hasOccupancyRate = occupancyRate > 0.4f;
+        bool hasOccupancyRate = occupancyRate > 0.25f;
 
         return hasEnoughPoints || isCenterClose || hasOccupancyRate;
     }
