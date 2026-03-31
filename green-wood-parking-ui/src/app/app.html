@@ -1,3 +1,24 @@
-<div id="map" #mapContainer></div>
+<div class="map" #mapContainer></div>
+
+<div class="tool-bar">
+  @if (_parkingSignalRService.isConnected()) {
+    <button matFab extended [class.status-connected]="true" (click)="startSignalConnection()">
+      <mat-icon>wifi</mat-icon>
+      Подключено
+    </button>
+  }
+
+  @if (!_parkingSignalRService.isConnected()) {
+    <button matFab extended [class.status-disconnected]="true" (click)="startSignalConnection()">
+      <mat-icon>wifi_off</mat-icon>
+      Не подключено
+    </button>
+  }
+
+  <button matFab extended disabled (click)="onRefresh()">
+    <mat-icon>update</mat-icon>
+    Обновить
+  </button>
+</div>
 
 <router-outlet />

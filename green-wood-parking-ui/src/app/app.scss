@@ -1,6 +1,29 @@
-#map {
+.map {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+.tool-bar {
+  padding: 10px 0;
+  position: absolute;
+  bottom: 0;
+  background: #eee;
+  width: 100%;
+  opacity: 0.8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  .status-connected {
+    background-color: #2e7d32 !important; /* Green 800 */
+    color: white !important;
+  }
+
+  .status-disconnected {
+    background-color: #d32f2f !important; /* Red 700 */
+    color: white !important;
+  }
 }

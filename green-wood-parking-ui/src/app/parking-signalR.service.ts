@@ -8,27 +8,47 @@ import { ParkingSlotDto } from './parking-slot-dto';
 })
 export class ParkingSignalRService {
 
-  private receivedStatus = signal<any>(null);
+  private receivedStatus = signal<string | null>(null);
   public receivedStatus$ = toObservable(this.receivedStatus);
 
   private receiveParkingData = signal<ParkingSlotDto | null>(null);
   public receiveParkingData$ = toObservable(this.receiveParkingData);
 
-  public hubConnection!: signalR.HubConnection;
+  public hubConnection: signalR.HubConnection;
 
-  public startConnection() {
+  private _isConnected = signal<boolean>(false);
+  public isConnected = this._isConnected.asReadonly();
+
+  constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:7196/parking-hub')
       .withAutomaticReconnect()
       .build();
 
+    this.setupSignalRListeners();
+  }
+
+  private setupSignalRListeners() {
+    // Обновляем сигнал при смене состояний
+    this.hubConnection.onclose(() => this._isConnected.set(false));
+    this.hubConnection.onreconnecting(() => this._isConnected.set(false));
+    this.hubConnection.onreconnected(() => this._isConnected.set(true));
+  }
+
+  public startConnection() {
     this.hubConnection
       .start()
       .then(() => {
         console.log('SignalR Connected!');
+        this.receivedStatus.set('Подключено');
+        this._isConnected.set(true);
         this.invokeGetParkingData();
       })
-      .catch(err => console.error('SignalR Error: ', err));
+      .catch((err: { message: string }) => {
+        console.error('SignalR Error: ', err);
+        this._isConnected.set(false);
+        this.receivedStatus.set(err.message);
+      });
 
     // Слушаем событие от бэкенда
     this.hubConnection.on('ReceiveWorkStatus', (data: any) => {

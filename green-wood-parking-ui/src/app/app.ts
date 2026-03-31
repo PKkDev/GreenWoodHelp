@@ -1,20 +1,23 @@
+import { HttpClient } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterOutlet } from '@angular/router';
+import { CameraViewComponent } from './camera-view/camera-view.component';
 import { ParkingSignalRService } from './parking-signalR.service';
 import { ParkingSlotDto } from './parking-slot-dto';
 import { parkingSLots } from './parking-slots';
 
-import { HttpClient } from '@angular/common/http';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import type { YMapFeature as YMapFeatureType } from '@yandex/ymaps3-types';
-import { CameraViewComponent } from './camera-view/camera-view.component';
+import { HubConnectionState } from '@microsoft/signalr';
+import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
 const ymaps3: typeof import('@yandex/ymaps3-types') = (window as any).ymaps3;
 const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatSnackBarModule],
+  imports: [RouterOutlet, MatSnackBarModule, MatButtonModule, MatIconModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -22,18 +25,18 @@ export class App implements AfterViewInit {
   protected readonly title = signal('green-wood-parking-ui');
 
   private mapContainer = viewChild.required<ElementRef<HTMLDivElement>>('mapContainer');
-  private map = signal<any | null>(null);
+  private map = signal<YMapType | null>(null);
 
   private parkingSlotMap = new Map<string, number[][][]>();
   private featureMap = new Map<string, YMapFeatureType>();
   private parkingSlotResponse = new Map<string, ParkingSlotDto>();
 
-  private readonly dialog = inject(MatDialog);
+  private readonly _dialog = inject(MatDialog);
   private readonly _snackBar = inject(MatSnackBar);
+  public readonly _parkingSignalRService = inject(ParkingSignalRService);
+  public readonly _httpClient = inject(HttpClient);
 
-  constructor(
-    private readonly parkingSignalRService: ParkingSignalRService,
-    private readonly httpClient: HttpClient) {
+  constructor() {
     this.parkingSlotMap.set('p29', parkingSLots['p29']);
     this.parkingSlotMap.set('p28', parkingSLots['p28']);
     this.parkingSlotMap.set('p30', parkingSLots['p30']);
@@ -51,66 +54,79 @@ export class App implements AfterViewInit {
 
     this.initMap().then(() => this.addAllParking());
 
-    this.parkingSignalRService.startConnection();
+    this.startSignalConnection();
 
-    this.parkingSignalRService.receivedStatus$.subscribe((data: string) => {
+    this._parkingSignalRService.receivedStatus$.subscribe((data: string | null) => {
       console.log('ReceiveWorkStatus', data);
-      this._snackBar.open(data, 'Close', {
-        duration: 2000,
-        verticalPosition: 'top',
-        horizontalPosition: 'right'
-      });
+      if (data) {
+        this._snackBar.open(data, 'Закрыть', {
+          duration: 1000 * 3,
+          verticalPosition: 'top',
+          horizontalPosition: 'right'
+        });
+      }
     });
 
-    this.parkingSignalRService.receiveParkingData$.subscribe((data: ParkingSlotDto | null) => {
+    this._parkingSignalRService.receiveParkingData$.subscribe((data: ParkingSlotDto | null) => {
       console.log('ReceiveParkingData', data);
       this.updateParkingOnMap(data);
     });
   }
 
-  private async initMap() {
-    await ymaps3.ready;
+  public startSignalConnection() {
+    const state = this._parkingSignalRService.hubConnection.state;
+    if (state === HubConnectionState.Connected || state === HubConnectionState.Connecting) {
+      return
+    }
 
-    const mapInstance = new YMap(this.mapContainer().nativeElement, {
-      location: {
-        center: [49.340300, 53.526747],
-        zoom: 18
-      },
-      showScaleInCopyrights: false
-    }, [
-      new YMapDefaultSchemeLayer({}),
-      new YMapFeatureDataSource({ id: 'featureSource', dynamic: false }),
-      new YMapLayer({ type: 'features', source: 'featureSource', zIndex: 1400 }),
-    ]);
+    this._parkingSignalRService.startConnection();
+  }
 
-    const listener = new YMapListener({
-      onClick: (object: any) => {
-        if (!object) {
-          return
+  public onRefresh() { }
+
+  private initMap(): Promise<void> {
+    return ymaps3.ready.then(() => {
+      const mapInstance = new YMap(this.mapContainer().nativeElement, {
+        location: {
+          center: [49.340300, 53.526747],
+          zoom: 18
+        },
+        showScaleInCopyrights: false
+      }, [
+        new YMapDefaultSchemeLayer({}),
+        new YMapFeatureDataSource({ id: 'featureSource', dynamic: false }),
+        new YMapLayer({ type: 'features', source: 'featureSource', zIndex: 1400 }),
+      ]);
+
+      const listener = new YMapListener({
+        onClick: (object: any) => {
+          if (!object) {
+            return
+          }
+
+          const actualResult = this.parkingSlotResponse.get(object.entity.id);
+          if (actualResult) {
+            this._httpClient.get(`https://localhost:7196/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
+              .subscribe({
+                next: (value) => {
+                  console.log(value)
+                  this._dialog.open(CameraViewComponent, {
+                    maxWidth: '95vw',
+                    maxHeight: '95vh',
+                    panelClass: 'full-screen-modal', // Кастомный класс для стилей
+                    data: { file: value }
+                  });
+                },
+                error: (err) => console.error(err),
+              })
+          }
         }
+      });
 
-        const actualResult = this.parkingSlotResponse.get(object.entity.id);
-        if (actualResult) {
-          this.httpClient.get(`https://localhost:7196/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
-            .subscribe({
-              next: (value) => {
-                console.log(value)
-                this.dialog.open(CameraViewComponent, {
-                  maxWidth: '95vw',
-                  maxHeight: '95vh',
-                  panelClass: 'full-screen-modal', // Кастомный класс для стилей
-                  data: { file: value }
-                });
-              },
-              error: (err) => console.error(err),
-            })
-        }
-      }
+      mapInstance.addChild(listener);
+
+      this.map.set(mapInstance);
     });
-
-    mapInstance.addChild(listener);
-
-    this.map.set(mapInstance);
   }
 
   protected addAllParking() {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
@@ -18,16 +18,16 @@ export class CameraViewComponent implements OnInit, OnDestroy {
   data = inject(MAT_DIALOG_DATA);
 
   private sanitizer = inject(DomSanitizer);
-  imagePath: SafeUrl | undefined;
+  public imagePath = signal<SafeUrl | undefined>(undefined);
 
   public ngOnInit(): void {
     const unsafeUrl = URL.createObjectURL(this.data.file);
-    this.imagePath = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
+    this.imagePath.set(this.sanitizer.bypassSecurityTrustUrl(unsafeUrl));
   }
 
   public ngOnDestroy(): void {
     if (this.imagePath) {
-      URL.revokeObjectURL(this.imagePath as string);
+      URL.revokeObjectURL(this.imagePath() as string);
     }
   }
 

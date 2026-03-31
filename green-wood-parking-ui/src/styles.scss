@@ -36,12 +36,11 @@ body {
   margin: 0;
   height: 100%;
 }
+
 html,
 body {
-  width: 100%;
-  height: 100%;
   margin: 0;
-  padding: 0;
+  height: 100%;
 }
 
 // .custom-fullscreen-dialog .mat-dialog-container {
@@ -51,8 +50,6 @@ body {
 //   padding: 0;
 //   overflow: hidden;
 // }
-
- 
 
 /* Убираем лишнее пространство вокруг картинки */
 .full-screen-modal .mat-mdc-dialog-surface {

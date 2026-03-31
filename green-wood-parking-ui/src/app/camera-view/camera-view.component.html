@@ -1,5 +1,5 @@
 <div class="image-viewer">
-  @if (imagePath) {
-    <img class="parking-frame" [src]="imagePath" alt="Parking Stream" (click)="onClose()" />
+  @if (imagePath()) {
+    <img class="parking-frame" [src]="imagePath()" alt="Parking Stream" (click)="onClose()" />
   }
 </div>
