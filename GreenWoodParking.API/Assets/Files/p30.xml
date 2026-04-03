@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <job>
+      <id>2</id>
+      <size>1</size>
+      <mode>annotation</mode>
+      <overlap>0</overlap>
+      <bugtracker></bugtracker>
+      <created>2026-03-25 16:34:21.512871+00:00</created>
+      <updated>2026-03-25 16:44:05.999413+00:00</updated>
+      <subset>default</subset>
+      <start_frame>0</start_frame>
+      <stop_frame>0</stop_frame>
+      <frame_filter></frame_filter>
+      <segments>
+        <segment>
+          <id>2</id>
+          <start>0</start>
+          <stop>0</stop>
+          <url>http://localhost:8080/api/jobs/2/dataset/export/api/jobs/2</url>
+        </segment>
+      </segments>
+      <owner>
+        <username>admin</username>
+        <email>admin@mail.ru</email>
+      </owner>
+      <assignee></assignee>
+      <labels>
+        <label>
+          <name>car</name>
+          <color>#34d1b7</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>parkingSpace</name>
+          <color>#24b353</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+      </labels>
+    </job>
+    <dumped>2026-04-03 07:55:48.785341+00:00</dumped>
+  </meta>
+  <image id="0" name="20260325191951.png" width="1080" height="864">
+    <polygon label="parkingSpace" source="manual" occluded="0" points="324.04,166.06;421.79,245.94;622.55,174.47;539.51,105.09" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="258.87,172.36;309.32,272.22;5.56,352.10;3.45,238.58" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="622.55,116.66;684.56,158.70;797.03,126.12;728.71,74.61" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="778.11,83.02;856.94,126.12;927.40,98.80;841.18,55.69" z_order="0">
+    </polygon>
+  </image>
+</annotations>

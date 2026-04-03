@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using YOLO26.Shared.CvatWorker;
 
 namespace GreenWoodParking.API.Services
 {
@@ -19,18 +18,19 @@ namespace GreenWoodParking.API.Services
         private readonly Yolo26Service _yolo26Service;
 
         private readonly List<string> needIds = new() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
-        //  private readonly List<string> needIds = new() { "p29" };
+        //  private readonly List<string> needIds = new() { "p28" };
         private readonly string url = "https://gw.videosreda.ru";
         private readonly string playlist = "playlist.m3u8";
 
         private readonly string _pathToScreenFolder;
 
-        private readonly CvatParser _parser;
+        private readonly ParkingSpacesService _parkingSpacesService;
 
         public ParkingService(
             IHttpClientFactory httpClientFactory,
             IHubContext<ParkingHub> hubContext,
-            Yolo26Service yolo26Service)
+            Yolo26Service yolo26Service,
+            ParkingSpacesService parkingSpacesService)
         {
             _httpClientFactory = httpClientFactory;
             _hubContext = hubContext;
@@ -38,17 +38,7 @@ namespace GreenWoodParking.API.Services
 
             _pathToScreenFolder = System.IO.Path.Combine(AppContext.BaseDirectory, "cameraview");
 
-            _parser = new();
-            _parser.Load("p31", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p31.json"));
-            _parser.Load("p30", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p30.json"));
-            _parser.Load("p29", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p29.json"));
-            _parser.Load("p28", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p28.json"));
-            _parser.Load("p22", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p22.json"));
-            _parser.Load("p21", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p21.json"));
-            _parser.Load("p15", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p15.json"));
-            _parser.Load("p16", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p16.json"));
-            _parser.Load("p13", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p13.json"));
-            _parser.Load("p14", System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "p14.json"));
+            _parkingSpacesService = parkingSpacesService;
         }
 
         public void StartWorkForuser(string connectionId)
@@ -135,7 +125,7 @@ namespace GreenWoodParking.API.Services
             CameraData cameraData)
         {
             var path = System.IO.Path.Combine(pathToScreenFolderCamera, filename);
-            var camera = _parser[cameraData.Id];
+            var camera = _parkingSpacesService.Parser[cameraData.Id];
 
             var predicts = _yolo26Service.Predict(path);
             var detectedCars = predicts.Where(x => x.LabelId == 2 || x.LabelId == 7); // Машины и грузовики

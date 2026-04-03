@@ -31,6 +31,7 @@ namespace GreenWoodParking.API
                 .AddHttpMessageHandler(provider => provider.GetRequiredService<RetryHandler>());
             // .AddHttpMessageHandler<RetryHandler>();
 
+            builder.Services.AddSingleton<ParkingSpacesService>();
             builder.Services.AddScoped<ParkingService>();
             builder.Services.AddScoped<Yolo26Service>();
 

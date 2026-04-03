@@ -17,14 +17,15 @@ namespace CameraCheckTest
     {
         public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\cameraview";
         public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\parkingview";
-        public static List<string> needIds = new List<string>() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
+         public static List<string> needIds = new List<string>() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
+      //  public static List<string> needIds = new List<string>() { "p28", };
         public static string url = "https://gw.videosreda.ru";
         public static string playlist = "playlist.m3u8";
 
         static void Main(string[] args)
         {
             //StartSaveCameraView();
-            StartSaveCameraViewV2();
+            // StartSaveCameraViewV2();
             StartSaveParking();
         }
 
@@ -179,16 +180,16 @@ namespace CameraCheckTest
 
 
             CvatParser parser = new();
-            parser.Load("p31", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p31.json"));
-            parser.Load("p30", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p30.json"));
-            parser.Load("p29", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p29.json"));
-            parser.Load("p28", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p28.json"));
-            parser.Load("p22", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p22.json"));
-            parser.Load("p21", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p21.json"));
-            parser.Load("p15", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p15.json"));
-            parser.Load("p16", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p16.json"));
-            parser.Load("p13", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p13.json"));
-            parser.Load("p14", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p14.json"));
+            parser.Load("p31", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p31.xml"));
+            parser.Load("p30", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p30.xml"));
+            parser.Load("p29", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p29.xml"));
+            parser.Load("p28", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p28.xml"));
+            parser.Load("p22", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p22.xml"));
+            parser.Load("p21", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p21.xml"));
+            parser.Load("p15", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p15.xml"));
+            parser.Load("p16", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p16.xml"));
+            parser.Load("p13", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p13.xml"));
+            parser.Load("p14", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p14.xml"));
 
             System.IO.DirectoryInfo diImages = new DirectoryInfo(pathToScreenFolder);
             var folders = diImages.GetDirectories();
