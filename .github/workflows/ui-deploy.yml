@@ -1,0 +1,45 @@
+name: Deploy UI to Production
+
+on:
+  push:
+    branches:
+      - release 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./green-wood-parking-ui/
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: "npm"
+        cache-dependency-path: "./green-wood-parking-ui/package-lock.json"
+
+    - name: Install dependencies
+      run: npm install
+
+    # - name: Run Tests
+    #   run:  npm test -- --watch=false --browsers=ChromeHeadless
+
+    - name: Build Angular
+      run: npm run build:prod
+
+    - name: SFTP deploy
+      if: success()
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      with:
+        server: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PASSWORD }}
+        local_path: "./green-wood-parking-ui/dist/green-wood-parking-ui/*"
+        remote_path: "/var/www/green-wood-parking-ui"
+        delete_remote_files: true
