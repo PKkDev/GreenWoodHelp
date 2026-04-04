@@ -61,9 +61,10 @@ export class App implements AfterViewInit {
       console.log('ReceiveWorkStatus', message);
       if (message) {
         this._snackBar.open(message, 'Закрыть', {
-          duration: 1000 * 3,
+          duration: 1000 * 3333,
           verticalPosition: 'top',
-          horizontalPosition: 'right'
+          horizontalPosition: 'right',
+
         });
         this.eventsMap.set(new Date(), message);
       }
@@ -124,7 +125,7 @@ export class App implements AfterViewInit {
                   this._dialog.open(CameraViewComponent, {
                     maxWidth: '95vw',
                     maxHeight: '95vh',
-                    panelClass: 'full-screen-modal', // Кастомный класс для стилей
+                    panelClass: 'full-screen-modal',
                     data: { file: value }
                   });
                 },
