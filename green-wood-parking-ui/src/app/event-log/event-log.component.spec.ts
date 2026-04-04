@@ -1,19 +1,27 @@
-/* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
 
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { EventLogComponent } from './event-log.component';
 
 describe('EventLogComponent', () => {
   let component: EventLogComponent;
   let fixture: ComponentFixture<EventLogComponent>;
 
-  beforeEach(async(() => {
+  let mockDialogRef: MatDialogRef<EventLogComponent>;
+  const mockData = { events: new Map<Date, string>() };
+
+  beforeEach((() => {
+    mockDialogRef = {
+      close: vi.fn()
+    } as unknown as MatDialogRef<EventLogComponent>;
+
     TestBed.configureTestingModule({
-      declarations: [ EventLogComponent ]
-    })
-    .compileComponents();
+      imports: [EventLogComponent],
+      providers: [
+        { provide: MatDialogRef, useValue: mockDialogRef },
+        { provide: MAT_DIALOG_DATA, useValue: mockData },
+      ]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

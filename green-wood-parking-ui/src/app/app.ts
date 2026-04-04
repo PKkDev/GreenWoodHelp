@@ -5,16 +5,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterOutlet } from '@angular/router';
+import { HubConnectionState } from '@microsoft/signalr';
 import { CameraViewComponent } from './camera-view/camera-view.component';
+import { EventLogComponent } from './event-log/event-log.component';
 import { ParkingSignalRService } from './parking-signalR.service';
 import { ParkingSlotDto } from './parking-slot-dto';
 import { parkingSLots } from './parking-slots';
 
-import { HubConnectionState } from '@microsoft/signalr';
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
-import { EventLogComponent } from './event-log/event-log.component';
-const ymaps3: typeof import('@yandex/ymaps3-types') = (window as any).ymaps3;
-const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
 
 @Component({
   selector: 'app-root',
@@ -96,6 +94,9 @@ export class App implements AfterViewInit {
 
   private initMap(): Promise<void> {
     return ymaps3.ready.then(() => {
+
+      const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
+
       const mapInstance = new YMap(this.mapContainer().nativeElement, {
         location: {
           center: [49.340300, 53.526747],
