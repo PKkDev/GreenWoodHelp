@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { BASE_URL } from './app.config';
 
 describe('App', () => {
 
@@ -14,6 +15,9 @@ describe('App', () => {
 
     TestBed.configureTestingModule({
       imports: [App],
+      providers: [
+        { provide: BASE_URL, useValue: 'https://localhost:7196' }
+      ]
     }).compileComponents();
   });
 
