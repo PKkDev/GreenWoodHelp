@@ -15,7 +15,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 export class CameraViewComponent implements OnInit, OnDestroy {
 
   private readonly dialogRef = inject(MatDialogRef<CameraViewComponent>);
-  data = inject(MAT_DIALOG_DATA);
+  private readonly data: { file: Blob } = inject(MAT_DIALOG_DATA);
 
   private sanitizer = inject(DomSanitizer);
   public imagePath = signal<SafeUrl | undefined>(undefined);

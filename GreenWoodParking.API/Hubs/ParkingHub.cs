@@ -1,6 +1,7 @@
 ﻿using GreenWoodParking.API.DTO;
 using GreenWoodParking.API.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.ML;
 
 namespace GreenWoodParking.API.Hubs
 {
@@ -17,8 +18,8 @@ namespace GreenWoodParking.API.Hubs
         }
 
         public async Task GetParkingData(ParkingService parkingService)
-        {
-            parkingService.StartWorkForuser(Context.ConnectionId);
+        { 
+            await parkingService.StartWorkForClient(Context.ConnectionId, Context.ConnectionAborted);
             await Clients.Caller.SendAsync("ReceiveWorkStatus", "Работа завершена");
         }
     }

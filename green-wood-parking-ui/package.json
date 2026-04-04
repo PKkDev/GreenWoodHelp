@@ -4,6 +4,7 @@
   "scripts": {
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production --base-href /green-wood-parking/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

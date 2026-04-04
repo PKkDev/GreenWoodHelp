@@ -12,6 +12,7 @@ import { parkingSLots } from './parking-slots';
 
 import { HubConnectionState } from '@microsoft/signalr';
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
+import { EventLogComponent } from './event-log/event-log.component';
 const ymaps3: typeof import('@yandex/ymaps3-types') = (window as any).ymaps3;
 const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
 
@@ -30,6 +31,8 @@ export class App implements AfterViewInit {
   private parkingSlotMap = new Map<string, number[][][]>();
   private featureMap = new Map<string, YMapFeatureType>();
   private parkingSlotResponse = new Map<string, ParkingSlotDto>();
+
+  private eventsMap = new Map<Date, string>();
 
   private readonly _dialog = inject(MatDialog);
   private readonly _snackBar = inject(MatSnackBar);
@@ -56,14 +59,15 @@ export class App implements AfterViewInit {
 
     this.startSignalConnection();
 
-    this._parkingSignalRService.receivedStatus$.subscribe((data: string | null) => {
-      console.log('ReceiveWorkStatus', data);
-      if (data) {
-        this._snackBar.open(data, 'Закрыть', {
+    this._parkingSignalRService.receivedStatus$.subscribe((message: string | null) => {
+      console.log('ReceiveWorkStatus', message);
+      if (message) {
+        this._snackBar.open(message, 'Закрыть', {
           duration: 1000 * 3,
           verticalPosition: 'top',
           horizontalPosition: 'right'
         });
+        this.eventsMap.set(new Date(), message);
       }
     });
 
@@ -82,7 +86,13 @@ export class App implements AfterViewInit {
     this._parkingSignalRService.startConnection();
   }
 
-  public onRefresh() { }
+  public onRefresh(): void { }
+
+  public onOpenEventLog(): void {
+    this._dialog.open(EventLogComponent, {
+      data: { events: new Map(this.eventsMap) }
+    });
+  }
 
   private initMap(): Promise<void> {
     return ymaps3.ready.then(() => {

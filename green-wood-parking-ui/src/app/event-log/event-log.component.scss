@@ -1,0 +1,25 @@
+.event-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 4px;
+  padding: 8px;
+
+  .event-item {
+    display: flex;
+    gap: 12px;
+    padding: 4px 0;
+    border-bottom: 1px thin #eee;
+
+    .event-time {
+      font-family: var(--mat-sys-body-medium), monospace;
+      font-weight: bold;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .event-message {
+      word-break: break-word;
+      font-family: var(--mat-sys-body-medium), monospace;
+    }
+  }
+}
