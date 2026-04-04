@@ -1,6 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import * as signalR from '@microsoft/signalr';
+import { BASE_URL } from './app.config';
 import { ParkingSlotDto } from './parking-slot-dto';
 
 @Injectable({
@@ -19,9 +20,11 @@ export class ParkingSignalRService {
   private _isConnected = signal<boolean>(false);
   public isConnected = this._isConnected.asReadonly();
 
+  public readonly _baseUrl = inject(BASE_URL);
+
   constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7196/parking-hub')
+      .withUrl(`${this._baseUrl}/parking-hub`)
       .withAutomaticReconnect()
       .build();
 

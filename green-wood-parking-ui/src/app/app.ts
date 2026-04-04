@@ -13,6 +13,7 @@ import { ParkingSlotDto } from './parking-slot-dto';
 import { parkingSLots } from './parking-slots';
 
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
+import { BASE_URL } from './app.config';
 
 @Component({
   selector: 'app-root',
@@ -36,6 +37,7 @@ export class App implements AfterViewInit {
   private readonly _snackBar = inject(MatSnackBar);
   public readonly _parkingSignalRService = inject(ParkingSignalRService);
   public readonly _httpClient = inject(HttpClient);
+  public readonly _baseUrl = inject(BASE_URL);
 
   constructor() {
     this.parkingSlotMap.set('p29', parkingSLots['p29']);
@@ -61,7 +63,7 @@ export class App implements AfterViewInit {
       console.log('ReceiveWorkStatus', message);
       if (message) {
         this._snackBar.open(message, 'Закрыть', {
-          duration: 1000 * 3333,
+          duration: 1000 * 3,
           verticalPosition: 'top',
           horizontalPosition: 'right',
 
@@ -100,7 +102,7 @@ export class App implements AfterViewInit {
 
       const mapInstance = new YMap(this.mapContainer().nativeElement, {
         location: {
-          center: [49.340300, 53.526747],
+          center: [49.340963, 53.527073],
           zoom: 18
         },
         showScaleInCopyrights: false
@@ -118,7 +120,7 @@ export class App implements AfterViewInit {
 
           const actualResult = this.parkingSlotResponse.get(object.entity.id);
           if (actualResult) {
-            this._httpClient.get(`https://localhost:7196/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
+            this._httpClient.get(`${this._baseUrl}/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
               .subscribe({
                 next: (value) => {
                   console.log(value)
