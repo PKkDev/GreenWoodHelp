@@ -4,26 +4,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!--Отключение агрессивного тримминга-->
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <MvcEnhancedModelMetadataSupport>true</MvcEnhancedModelMetadataSupport>
+    <!--Отключение агрессивного тримминга-->
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Remove="Assets\Files\p13.json" />
-    <Content Remove="Assets\Files\p14.json" />
-    <Content Remove="Assets\Files\p15.json" />
-    <Content Remove="Assets\Files\p16.json" />
-    <Content Remove="Assets\Files\p21.json" />
-    <Content Remove="Assets\Files\p22.json" />
-    <Content Remove="Assets\Files\p28.json" />
-    <Content Remove="Assets\Files\p29.json" />
-    <Content Remove="Assets\Files\p30.json" />
-    <Content Remove="Assets\Files\p31.json" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FFMediaToolkit" Version="4.8.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.ML" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.19" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
   </ItemGroup>
 

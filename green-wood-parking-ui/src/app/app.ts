@@ -120,7 +120,7 @@ export class App implements AfterViewInit {
 
           const actualResult = this.parkingSlotResponse.get(object.entity.id);
           if (actualResult) {
-            this._httpClient.get(`${this._baseUrl}/api/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
+            this._httpClient.get(`${this._baseUrl}/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
               .subscribe({
                 next: (value) => {
                   console.log(value)

@@ -2,13 +2,15 @@
 
 namespace GreenWoodParking.API.Controllers
 {
-    [Route("api/file-view")]
+    [Route("file-view")]
     [ApiController]
     public class CameraViewController : ControllerBase
     {
         [HttpGet("camera/{connectionId}/{cameraId}/{fileName}")]
         public IActionResult GetCameraView(string connectionId, string cameraId, string fileName)
         {
+            Console.WriteLine($"Получение файла для connectionId:{connectionId}, cameraId: {cameraId},fileName: {fileName}");
+
             var pathToScreenFolder = System.IO.Path.Combine(AppContext.BaseDirectory, "cameraview");
             var pathToScreenFolderCamera = System.IO.Path.Combine(pathToScreenFolder, connectionId, cameraId, fileName);
 

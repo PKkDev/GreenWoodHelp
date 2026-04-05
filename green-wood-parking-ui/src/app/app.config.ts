@@ -10,6 +10,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    { provide: BASE_URL, useValue: 'https://localhost:7196' }
+    // { provide: BASE_URL, useValue: 'https://localhost:7196' }
+    { provide: BASE_URL, useValue: 'https://custplace.ru/api' }
   ]
 };

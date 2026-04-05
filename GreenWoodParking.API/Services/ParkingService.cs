@@ -56,10 +56,16 @@ namespace GreenWoodParking.API.Services
             var camerasResponseContent = await camerasResponse.Content.ReadAsStringAsync(ct);
             var cameras = JsonConvert.DeserializeObject<GreenWoodCameras>(camerasResponseContent);
 
+            Console.WriteLine("Получен cameras.json");
+
             if (cameras != null)
             {
+                Console.WriteLine($"в cameras.json записей: {cameras.Cameras.Count}");
 
                 var camerasNeeded = cameras.Cameras.Where(x => needIds.Contains(x.Id));
+
+                Console.WriteLine($"в cameras.json нужных записей: {camerasNeeded.Count()}/{needIds.Count}");
+
                 foreach (var camera in camerasNeeded)
                 {
                     await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Получение кадров для {camera.Id}", ct);
@@ -130,7 +136,7 @@ namespace GreenWoodParking.API.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Получение кадров ошибка - {ex.Message}");
+                Console.WriteLine($"Получение кадров ошибка - {ex}");
                 return await GetFrameFromCamera(connectionId, camera, pathToScreenFolderCamera, ++index, max, ct);
             }
         }
