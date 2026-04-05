@@ -37,22 +37,23 @@ namespace GreenWoodParking.API
 
             builder.Services
                 .AddPredictionEnginePool<Yolo26InputData, Yolo26OutputData>()
-                .FromFile(modelName: "Yolo26m", filePath: "Assets/YoloModel/yolo26m.zip", watchForChanges: true);
-
+                .FromFile(modelName: "Yolo26m", filePath: "Assets/Files/YoloModel/yolo26m.zip", watchForChanges: true);
+             
             // https://github.com/radek-k/FFMediaToolkit#setup
-            // https://github.com/GyanD/codexffmpeg/releases?q=7.&expanded=true
-            // ffmpeg-7.1.1-full_build-shared  
-
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 Console.WriteLine("Use FFmpeg for linux");
-                //FFmpegLoader.FFmpegPath = "/usr/bin";
-                FFmpegLoader.FFmpegPath = "/usr/lib/*-linux-gnu/";
+                // https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2024-11-30-13-12
+                // ffmpeg-n7.1-39-g64e2864cb9-linux64-gpl-shared-7.1.tar.xz 
+                var FFmpegPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "ffmpeg-linux");
+                FFmpegLoader.FFmpegPath = FFmpegPath;
             }
             else
             {
                 Console.WriteLine("Use FFmpeg for windows");
-                var FFmpegPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "ffmpeg");
+                // https://github.com/GyanD/codexffmpeg/releases?q=7.&expanded=true
+                // ffmpeg-7.1.1-full_build-shared  
+                var FFmpegPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "ffmpeg-win");
                 FFmpegLoader.FFmpegPath = FFmpegPath;
             }
 
