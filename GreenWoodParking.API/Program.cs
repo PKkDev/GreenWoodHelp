@@ -1,10 +1,7 @@
-
 using FFMediaToolkit;
 using GreenWoodParking.API.Hubs;
 using GreenWoodParking.API.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.ML;
-using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using System.Runtime.InteropServices;
 using YOLO26.Shared.YOLOWorker.DataStructures;
@@ -21,8 +18,7 @@ namespace GreenWoodParking.API
             {
                 options.AddPolicy("SignalRPolicy", policy =>
                 {
-                    policy
-                          .WithOrigins("http://localhost:4200", "https://custplace.ru")
+                    policy.WithOrigins("http://localhost:4200", "https://custplace.ru")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -34,7 +30,6 @@ namespace GreenWoodParking.API
             builder.Services.AddScoped<RetryHandler>();
             builder.Services.AddHttpClient("CameraDataClient")
                 .AddHttpMessageHandler(provider => provider.GetRequiredService<RetryHandler>());
-            // .AddHttpMessageHandler<RetryHandler>();
 
             builder.Services.AddSingleton<ParkingSpacesService>();
             builder.Services.AddScoped<ParkingService>();

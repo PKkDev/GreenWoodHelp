@@ -1,0 +1,77 @@
+name: Deploy API to Production
+
+on:
+  push:
+    branches: ["release"] 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./GreenWoodParking.API/
+
+    strategy:
+      matrix:
+        net-version: [8.0.x]
+
+    steps: 
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET ${{ matrix.net-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.net-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish GreenWoodParking.API.csproj -c Release -o Release --sc true -r linux-x64
+
+      #- name: Create File
+      #  uses: finnp/create-file-action@1.0.0
+      #  env:
+      #    FILE_NAME: "./GreenWoodParking.API/Release/appsettings.private.json"
+      #    FILE_DATA: ${{ secrets.APIPRIVATE }}
+
+      - name: SFTP deploy
+        if: success()
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWORD }}
+          local_path: "./VikaBD.Server/Release/*"
+          #remote_path: "/api-services/vika-bd-service-api"
+          remote_path: "/var/www/green-wood-parking-api"
+          delete_remote_files: true
+
+      - name: Restart api service
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            # 1. Меняем владельца на www-data (пользователь веб-сервера)
+            sudo chown -R www-data:www-data /var/www/green-wood-parking-api/
+      
+            # 2. Устанавливаем права на папки и файлы
+            sudo find /var/www/green-wood-parking-api/ -type d -exec chmod 755 {} \;
+            sudo find /var/www/green-wood-parking-api/ -type f -exec chmod 644 {} \;
+      
+            # 3. Делаем бинарник исполняемым
+            sudo chmod +x /var/www/green-wood-parking-api/GreenWoodParking.API
+
+            # 4. Перезапускаем сервис
+            sudo systemctl restart gwp-api
