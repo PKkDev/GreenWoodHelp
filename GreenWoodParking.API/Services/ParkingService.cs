@@ -12,7 +12,6 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using YOLO26.Shared.CvatWorker.Model;
-using YOLO26.Shared.YOLOWorker.DataStructures;
 
 namespace GreenWoodParking.API.Services
 {
@@ -22,7 +21,7 @@ namespace GreenWoodParking.API.Services
         private readonly IHubContext<ParkingHub> _hubContext;
         private readonly Yolo26Service _yolo26Service;
 
-        private readonly List<string> needIds = new() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15" };
+        private readonly List<string> needIds = new() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40" };
         //  private readonly List<string> needIds = new() { "p28" };
         private readonly string url = "https://gw.videosreda.ru";
         private readonly string playlist = "playlist.m3u8";

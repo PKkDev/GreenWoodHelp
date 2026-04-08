@@ -1,0 +1,3 @@
+[submodule "ObjectDetection"]
+	path = ObjectDetection
+	url = https://github.com/PKkDev/ObjectDetection
