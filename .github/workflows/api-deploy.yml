@@ -55,7 +55,7 @@ jobs:
           server: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
-          local_path: "./VikaBD.Server/Release/*"
+          local_path: "./GreenWoodParking.API/Release/*"
           #remote_path: "/api-services/vika-bd-service-api"
           remote_path: "/var/www/green-wood-parking-api"
           delete_remote_files: true
