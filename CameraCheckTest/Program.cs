@@ -15,8 +15,8 @@ namespace CameraCheckTest
 {
     internal class Program
     {
-        public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\cameraview";
-        public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\parkingview";
+        public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\cameraview";
+        public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\parkingview";
         public static List<string> needIds = new List<string>() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40" };
         //  public static List<string> needIds = new List<string>() { "p28", };
         public static string url = "https://gw.videosreda.ru";
@@ -190,6 +190,8 @@ namespace CameraCheckTest
             parser.Load("p16", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p16.xml"));
             parser.Load("p13", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p13.xml"));
             parser.Load("p14", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p14.xml"));
+            parser.Load("p39", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p39.xml"));
+            parser.Load("p40", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p40.xml"));
 
             System.IO.DirectoryInfo diImages = new DirectoryInfo(pathToScreenFolder);
             var folders = diImages.GetDirectories();

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <job>
+      <id>18</id>
+      <size>1</size>
+      <mode>annotation</mode>
+      <overlap>0</overlap>
+      <bugtracker></bugtracker>
+      <created>2026-04-08 19:25:10.954235+00:00</created>
+      <updated>2026-04-08 19:30:27.255476+00:00</updated>
+      <subset>default</subset>
+      <start_frame>0</start_frame>
+      <stop_frame>0</stop_frame>
+      <frame_filter></frame_filter>
+      <segments>
+        <segment>
+          <id>18</id>
+          <start>0</start>
+          <stop>0</stop>
+          <url>http://localhost:8080/api/jobs/18/dataset/export/api/jobs/18</url>
+        </segment>
+      </segments>
+      <owner>
+        <username>admin</username>
+        <email>admin@mail.ru</email>
+      </owner>
+      <assignee></assignee>
+      <labels>
+        <label>
+          <name>car</name>
+          <color>#34d1b7</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>parkingSpace</name>
+          <color>#24b353</color>
+          <type>any</type>
+          <attributes>
+          </attributes>
+        </label>
+      </labels>
+    </job>
+    <dumped>2026-04-08 19:30:41.915531+00:00</dumped>
+  </meta>
+  <image id="0" name="20260405082147.png" width="1080" height="864">
+    <polygon label="parkingSpace" source="manual" occluded="0" points="764.45,723.14;847.48,547.61;284.10,477.18;204.20,598.10" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="587.86,860.83;592.07,787.25;8.71,584.39;1.35,860.83" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="902.14,438.29;626.75,431.98;594.17,336.34;916.85,363.66" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="224.18,350.00;315.63,305.85;242.05,251.20;164.27,285.88" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="347.16,290.09;423.89,262.76;339.80,231.23;289.35,244.89" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="476.45,250.15;548.97,225.97;437.56,169.21;374.49,192.34" z_order="0">
+    </polygon>
+    <polygon label="parkingSpace" source="manual" occluded="0" points="592.07,206.00;634.11,194.44;532.15,160.80;489.06,171.31" z_order="0">
+    </polygon>
+  </image>
+</annotations>

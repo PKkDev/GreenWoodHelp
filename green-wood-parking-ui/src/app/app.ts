@@ -50,6 +50,8 @@ export class App implements AfterViewInit {
     this.parkingSlotMap.set('p14', parkingSLots['p14']);
     this.parkingSlotMap.set('p15', parkingSLots['p15']);
     this.parkingSlotMap.set('p16', parkingSLots['p16']);
+    this.parkingSlotMap.set('p39', parkingSLots['p39']);
+    this.parkingSlotMap.set('p40', parkingSLots['p40']);
   }
 
   public ngAfterViewInit() {

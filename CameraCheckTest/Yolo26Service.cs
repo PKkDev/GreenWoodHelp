@@ -250,7 +250,7 @@ namespace ObjectDetection.WinApp.Services
                     {
                         var pointCheck = spaces.Any(x => Yolo26ServiceHelper.IsPointInPolygon(x.Points, p));
                         // Красный - точка попала в бокс парковки, Зеленый - не попала
-                        Color pointColor = pointCheck ? Color.Red : Color.Lime;
+                        Color pointColor = pointCheck ? Color.Orange : Color.GreenYellow;
                         ctx.Fill(pointColor, new EllipsePolygon(p, 2f));
                         //ctx.DrawText($"C.D.", font, Color.Red, new PointF(p.X + 5, p.Y + 5));
                     }

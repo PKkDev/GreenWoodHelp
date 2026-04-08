@@ -40,7 +40,7 @@ public static class Yolo26ServiceHelper
         float offset = 5f;
 
         var pointsToTest =
-            new[] { 0.30f, 0.40f, 0.50f, 0.60f, 0.70f }
+            new[] { 0.20f, 0.30f, 0.40f, 0.50f, 0.60f, 0.70f, 0.80f }
             .Select(p => new PointF(xLeft + width * p, yBottom - offset));
 
         return pointsToTest.ToArray();
