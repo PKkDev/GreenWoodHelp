@@ -1,14 +1,11 @@
 name: Deploy API to Production
 
-variables:
-  # Инструктирует GitLab выкачивать сабмодули рекурсивно перед началом сборки
-  GIT_SUBMODULE_STRATEGY: recursive
-
 on:
   push:
     branches: ["release"] 
 
 jobs:
+  
   build-and-deploy:
     runs-on: ubuntu-latest
 
@@ -24,6 +21,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          # Выкачивает вложенные модули
+          submodules: recursive 
 
       - name: Setup .NET ${{ matrix.net-version }}
         uses: actions/setup-dotnet@v3
