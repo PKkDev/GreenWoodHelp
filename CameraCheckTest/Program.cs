@@ -25,8 +25,13 @@ namespace CameraCheckTest
         static void Main(string[] args)
         {
             //StartSaveCameraView();
+
+            CleareOutputFolder();
             StartSaveCameraViewV2();
             StartSaveParking();
+
+            Console.WriteLine("[DONE] работа завершена");
+            Console.ReadKey();
         }
 
         public static void StartSaveCameraView()
@@ -168,16 +173,18 @@ namespace CameraCheckTest
             }
         }
 
-        public static void StartSaveParking()
+        public static void CleareOutputFolder()
         {
-            var yolo26Service = new Yolo26Service();
-
             System.IO.DirectoryInfo di = new DirectoryInfo(pathToParkingFolder);
             foreach (FileInfo file in di.GetFiles())
                 file.Delete();
             foreach (DirectoryInfo dir in di.GetDirectories())
                 dir.Delete(true);
+        }
 
+        public static void StartSaveParking()
+        {
+            var yolo26Service = new Yolo26Service();
 
             CvatParser parser = new();
             parser.Load("p31", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p31.xml"));
