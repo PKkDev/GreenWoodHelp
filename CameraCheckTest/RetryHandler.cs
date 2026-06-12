@@ -10,7 +10,7 @@
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            HttpResponseMessage response = null;
+            HttpResponseMessage? response = null;
             for (int i = 0; i < MaxRetries; i++)
             {
                 try
@@ -22,8 +22,15 @@
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Отправка HTTP Request ошибка - {ex.Message}");
+                    Console.ResetColor();
                 }
+            }
+
+            if (response == null)
+            {
+                throw new Exception($"Не удалось распарчить ответ");
             }
 
             return response;

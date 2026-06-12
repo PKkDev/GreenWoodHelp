@@ -30,9 +30,11 @@ namespace CameraCheckTest
             StartSaveCameraViewV2();
             StartSaveParking();
 
-            Console.WriteLine("[DONE] работа завершена");
+            Console.WriteLine("Работа завершена", Color.Green);
             Console.ReadKey();
         }
+
+
 
         public static void StartSaveCameraView()
         {
@@ -113,6 +115,8 @@ namespace CameraCheckTest
             var camerasResponse = client.GetAsync($"{url}/cameras.json").GetAwaiter().GetResult();
             var camerasResponseContent = camerasResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             var cameras = JsonConvert.DeserializeObject<GreenWoodCameras>(camerasResponseContent);
+
+            WriteSuccess("Получен cameras.json");
 
             var camerasNeeded = cameras.Cameras.Where(x => needIds.Contains(x.Id));
             foreach (var camera in camerasNeeded)
@@ -220,6 +224,20 @@ namespace CameraCheckTest
                     yolo26Service.DrawDetectionsAndParking(myFile.FullName, imagePathProcessedParking, item.ParkingSpaces, predicts);
                 }
             }
+        }
+
+        public static void WriteSuccess(string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
+
+        public static void WriteError(string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(text);
+            Console.ResetColor();
         }
     }
 }
