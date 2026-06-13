@@ -22,12 +22,21 @@ namespace CameraCheckTest
         public static string url = "https://gw.videosreda.ru";
         public static string playlist = "playlist.m3u8";
 
+        public static object consoleLock = new object();
+
         static void Main(string[] args)
         {
             //StartSaveCameraView();
+
+            CleareOutputFolder();
             StartSaveCameraViewV2();
             StartSaveParking();
+
+            Console.WriteLine("Работа завершена", Color.Green);
+            Console.ReadKey();
         }
+
+
 
         public static void StartSaveCameraView()
         {
@@ -109,17 +118,28 @@ namespace CameraCheckTest
             var camerasResponseContent = camerasResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             var cameras = JsonConvert.DeserializeObject<GreenWoodCameras>(camerasResponseContent);
 
+            WriteSuccess("Получен cameras.json");
+
             var camerasNeeded = cameras.Cameras.Where(x => needIds.Contains(x.Id));
+            List<Task> tasks = new();
             foreach (var camera in camerasNeeded)
             {
-                Console.WriteLine($"Получение кадров для {camera.Id}");
+                // 1. Фиксируем переменную для замыкания
+                var currentCamera = camera;
+                tasks.Add(Task.Run(() =>
+                {
+                    Console.WriteLine($"[{currentCamera.Id}] Получение кадров");
 
-                var pathToScreenFolderCamera = System.IO.Path.Combine(pathToScreenFolder, camera.Id);
-                if (!Directory.Exists(pathToScreenFolderCamera))
-                    Directory.CreateDirectory(pathToScreenFolderCamera);
+                    var pathToScreenFolderCamera = System.IO.Path.Combine(pathToScreenFolder, currentCamera.Id);
+                    if (!Directory.Exists(pathToScreenFolderCamera))
+                        Directory.CreateDirectory(pathToScreenFolderCamera);
 
-                GetFrameFromCamera(camera, pathToScreenFolderCamera, 0, 4);
+                    GetFrameFromCamera(currentCamera, pathToScreenFolderCamera, 0, 4);
+
+                }));
             }
+
+            Task.WhenAll(tasks).GetAwaiter().GetResult();
         }
 
         public static void GetFrameFromCamera(CameraData camera, string pathToScreenFolderCamera, int index, int max)
@@ -129,7 +149,7 @@ namespace CameraCheckTest
                 if (index >= max)
                     return;
 
-                Console.WriteLine($"Подключение к камере попытка - {index}");
+                Console.WriteLine($"[{camera.Id}] Подключение к камере попытка - {index}");
 
                 var cameraVideoUrl = $"{camera.Url}/{playlist}";
 
@@ -148,7 +168,7 @@ namespace CameraCheckTest
                 //{
                 //    if (!file.Video.TryGetNextFrame(buffer)) break;
                 //}
-                Console.WriteLine($"Берём кадр");
+                Console.WriteLine($"[{camera.Id}] Берём кадр");
 
                 file.Video.TryGetNextFrame(buffer);
                 var filename = $"{DateTime.Now:yyyyMMddHHmmss}.png";
@@ -159,25 +179,28 @@ namespace CameraCheckTest
                 resultBmp.SaveAsJpeg(path);
                 bmp.Dispose();
                 resultBmp.Dispose();
-                Console.WriteLine($"Фрейм сохранён как: {filename}");
+                WriteSuccess($"[{camera.Id}] Фрейм сохранён как: {filename}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Получение кадров ошибка - {ex.Message}");
+                WriteError($"[{camera.Id}] Получение кадров ошибка - {ex.Message}");
                 GetFrameFromCamera(camera, pathToScreenFolderCamera, ++index, max);
             }
         }
 
-        public static void StartSaveParking()
+        public static void CleareOutputFolder()
         {
-            var yolo26Service = new Yolo26Service();
-
             System.IO.DirectoryInfo di = new DirectoryInfo(pathToParkingFolder);
             foreach (FileInfo file in di.GetFiles())
                 file.Delete();
             foreach (DirectoryInfo dir in di.GetDirectories())
                 dir.Delete(true);
+        }
 
+        public static void StartSaveParking()
+        {
+            Console.WriteLine("Зпуска этапа AI");
+            var yolo26Service = new Yolo26Service();
 
             CvatParser parser = new();
             parser.Load("p31", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p31.xml"));
@@ -198,7 +221,7 @@ namespace CameraCheckTest
 
             foreach (var item in parser.ParkingData)
             {
-                Console.WriteLine($"Обработка для {item.Id}");
+                Console.WriteLine($"[{item.Id}] Обработка");
 
                 var folder = folders.First(x => x.Name == item.Id);
                 if (folder != null)
@@ -212,6 +235,26 @@ namespace CameraCheckTest
                     var imagePathProcessedParking = $"{pathToParkingFolder}\\{item.Id}_{myFile.Name}-parking.png";
                     yolo26Service.DrawDetectionsAndParking(myFile.FullName, imagePathProcessedParking, item.ParkingSpaces, predicts);
                 }
+            }
+        }
+
+        public static void WriteSuccess(string text)
+        {
+            lock (consoleLock)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(text);
+                Console.ResetColor();
+            }
+        }
+
+        public static void WriteError(string text)
+        {
+            lock (consoleLock)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(text);
+                Console.ResetColor();
             }
         }
     }

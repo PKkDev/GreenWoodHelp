@@ -3,23 +3,23 @@
   <version>1.1</version>
   <meta>
     <job>
-      <id>2</id>
+      <id>19</id>
       <size>1</size>
       <mode>annotation</mode>
       <overlap>0</overlap>
       <bugtracker></bugtracker>
-      <created>2026-03-25 16:34:21.512871+00:00</created>
-      <updated>2026-03-25 16:44:05.999413+00:00</updated>
-      <subset>default</subset>
+      <created>2026-06-12 06:42:00.731573+00:00</created>
+      <updated>2026-06-12 07:12:24.144863+00:00</updated>
+      <subset>Train</subset>
       <start_frame>0</start_frame>
       <stop_frame>0</stop_frame>
       <frame_filter></frame_filter>
       <segments>
         <segment>
-          <id>2</id>
+          <id>19</id>
           <start>0</start>
           <stop>0</stop>
-          <url>http://localhost:8080/api/jobs/2/dataset/export/api/jobs/2</url>
+          <url>http://localhost:8080/api/jobs/19/dataset/export/api/jobs/19</url>
         </segment>
       </segments>
       <owner>
@@ -44,16 +44,16 @@
         </label>
       </labels>
     </job>
-    <dumped>2026-04-03 07:55:48.785341+00:00</dumped>
+    <dumped>2026-06-12 11:11:31.157994+00:00</dumped>
   </meta>
-  <image id="0" name="20260325191951.png" width="1080" height="864">
-    <polygon label="parkingSpace" source="manual" occluded="0" points="324.04,166.06;421.79,245.94;622.55,174.47;539.51,105.09" z_order="0">
+  <image id="0" name="20260612095504.png" width="1080" height="864">
+    <polygon label="parkingSpace" source="manual" occluded="0" points="417.20,209.40;490.00,250.30;646.40,200.50;577.40,165.70" z_order="0">
     </polygon>
-    <polygon label="parkingSpace" source="manual" occluded="0" points="258.87,172.36;309.32,272.22;5.56,352.10;3.45,238.58" z_order="0">
+    <polygon label="parkingSpace" source="manual" occluded="0" points="345.50,223.20;397.00,269.00;106.30,353.20;64.10,307.90" z_order="0">
     </polygon>
-    <polygon label="parkingSpace" source="manual" occluded="0" points="622.55,116.66;684.56,158.70;797.03,126.12;728.71,74.61" z_order="0">
+    <polygon label="parkingSpace" source="manual" occluded="0" points="649.60,162.10;716.00,193.30;773.20,162.90;722.20,137.50" z_order="0">
     </polygon>
-    <polygon label="parkingSpace" source="manual" occluded="0" points="778.11,83.02;856.94,126.12;927.40,98.80;841.18,55.69" z_order="0">
+    <polygon label="parkingSpace" source="manual" occluded="0" points="761.90,131.70;800.60,161.80;857.00,143.20;799.00,126.10" z_order="0">
     </polygon>
   </image>
 </annotations>
