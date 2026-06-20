@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -21,8 +20,8 @@ namespace GreenWoodParking.API.Services
         private readonly IHubContext<ParkingHub> _hubContext;
         private readonly Yolo26Service _yolo26Service;
 
-        private readonly List<string> needIds = new() { "p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40" };
-        //  private readonly List<string> needIds = new() { "p28" };
+        private readonly string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24", "p25"];
+        //  private readonly string[] needIds = ["p38", "p37", "p24", "p25"];
         private readonly string url = "https://gw.videosreda.ru";
         private readonly string playlist = "playlist.m3u8";
 
@@ -63,22 +62,28 @@ namespace GreenWoodParking.API.Services
 
                 var camerasNeeded = cameras.Cameras.Where(x => needIds.Contains(x.Id));
 
-                Console.WriteLine($"в cameras.json нужных записей: {camerasNeeded.Count()}/{needIds.Count}");
+                Console.WriteLine($"в cameras.json нужных записей: {camerasNeeded.Count()}/{needIds.Length}");
 
+                List<Task> tasks = [];
                 foreach (var camera in camerasNeeded)
                 {
-                    await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Получение кадров для {camera.Id}", ct);
-
-                    var pathToScreenFolderCamera = System.IO.Path.Combine(_pathToScreenFolder, $"{connectionId}", camera.Id);
-                    if (!Directory.Exists(pathToScreenFolderCamera))
-                        Directory.CreateDirectory(pathToScreenFolderCamera);
-
-                    var filename = await GetFrameFromCamera(connectionId, camera, pathToScreenFolderCamera, 0, 4, ct);
-                    if (filename != null)
+                    var currentCamera = camera;
+                    tasks.Add(Task.Run(async () =>
                     {
-                        await CheckParking(connectionId, pathToScreenFolderCamera, filename, camera, ct);
-                    }
+                        await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Получение кадров для {currentCamera.Id}", ct);
+
+                        var pathToScreenFolderCamera = System.IO.Path.Combine(_pathToScreenFolder, $"{connectionId}", currentCamera.Id);
+                        if (!Directory.Exists(pathToScreenFolderCamera))
+                            Directory.CreateDirectory(pathToScreenFolderCamera);
+
+                        var filename = await GetFrameFromCamera(connectionId, currentCamera, pathToScreenFolderCamera, 0, 4, ct);
+                        if (filename != null)
+                        {
+                            await CheckParking(connectionId, pathToScreenFolderCamera, filename, currentCamera, ct);
+                        }
+                    }, ct));
                 }
+                Task.WhenAll(tasks).GetAwaiter().GetResult();
             }
             else
             {
@@ -149,25 +154,32 @@ namespace GreenWoodParking.API.Services
             var path = System.IO.Path.Combine(pathToScreenFolderCamera, filename);
             var camera = _parkingSpacesService.Parser[cameraData.Id];
 
-            var predicts = _yolo26Service.Predict(path);
-            var detectedCars = predicts.Where(x => x.LabelId == 2 || x.LabelId == 7); // Машины и грузовики
-
-            foreach (var space in camera.ParkingSpaces)
+            if (camera == null)
             {
-                bool occupied = detectedCars.Any(d => Yolo26ServiceHelper.IsSpaceOccupied(space.Points, d));
-                space.IsOccupied = occupied;
+                Console.WriteLine($"Не заданы координаты парковки для {cameraData.Id}");
             }
+            else
+            {
+                var predicts = _yolo26Service.Predict(path);
+                var detectedCars = predicts.Where(x => x.LabelId == 2 || x.LabelId == 7); // Машины и грузовики
 
-            var freeSpaces = camera.ParkingSpaces.Where(x => !x.IsOccupied);
+                foreach (var space in camera.ParkingSpaces)
+                {
+                    bool occupied = detectedCars.Any(d => Yolo26ServiceHelper.IsSpaceOccupied(space.Points, d));
+                    space.IsOccupied = occupied;
+                }
 
-            await DrawParking(path, path, freeSpaces, ct);
+                var freeSpaces = camera.ParkingSpaces.Where(x => !x.IsOccupied);
 
-            ParkingSlotDto result = new(camera.Id, camera.ParkingSpaces.Any(x => !x.IsOccupied));
-            result.ImgUrl = $"{connectionId}/{camera.Id}/{filename}";
-            result.TotalCount = camera.ParkingSpaces.Count;
-            result.ParkingSlotCount = camera.ParkingSpaces.Count(x => !x.IsOccupied);
+                await DrawParking(path, path, freeSpaces, ct);
 
-            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveParkingData", result, ct);
+                ParkingSlotDto result = new(camera.Id, camera.ParkingSpaces.Any(x => !x.IsOccupied));
+                result.ImgUrl = $"{connectionId}/{camera.Id}/{filename}";
+                result.TotalCount = camera.ParkingSpaces.Count;
+                result.ParkingSlotCount = camera.ParkingSpaces.Count(x => !x.IsOccupied);
+
+                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveParkingData", result, ct);
+            }
         }
 
         public async Task DrawParking(string sourcePath, string outputPath, IEnumerable<ParkingSpace> freeSpaces, CancellationToken ct)

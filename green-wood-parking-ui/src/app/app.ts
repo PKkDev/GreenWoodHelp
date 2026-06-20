@@ -8,12 +8,13 @@ import { RouterOutlet } from '@angular/router';
 import { HubConnectionState } from '@microsoft/signalr';
 import { CameraViewComponent } from './camera-view/camera-view.component';
 import { EventLogComponent } from './event-log/event-log.component';
-import { ParkingSignalRService } from './parking-signalR.service';
-import { ParkingSlotDto } from './parking-slot-dto';
-import { parkingSLots } from './parking-slots';
+ 
 
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
 import { BASE_URL } from './app.config';
+import { ParkingSlotDto } from './models/parking-slot-dto';
+import { parkingSLots } from './models/parking-slots';
+import { ParkingSignalRService } from './services/parking-signalR.service';
 
 @Component({
   selector: 'app-root',
@@ -52,6 +53,10 @@ export class App implements AfterViewInit {
     this.parkingSlotMap.set('p16', parkingSLots['p16']);
     this.parkingSlotMap.set('p39', parkingSLots['p39']);
     this.parkingSlotMap.set('p40', parkingSLots['p40']);
+    this.parkingSlotMap.set('p37', parkingSLots['p37']);
+    this.parkingSlotMap.set('p38', parkingSLots['p38']);
+    this.parkingSlotMap.set('p24', parkingSLots['p24']);
+    this.parkingSlotMap.set('p25', parkingSLots['p25']);
   }
 
   public ngAfterViewInit() {
