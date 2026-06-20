@@ -8,7 +8,7 @@ import { RouterOutlet } from '@angular/router';
 import { HubConnectionState } from '@microsoft/signalr';
 import { CameraViewComponent } from './camera-view/camera-view.component';
 import { EventLogComponent } from './event-log/event-log.component';
- 
+
 
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
 import { BASE_URL } from './app.config';
@@ -102,52 +102,52 @@ export class App implements AfterViewInit {
     });
   }
 
-  private initMap(): Promise<void> {
-    return ymaps3.ready.then(() => {
+  private async initMap(): Promise<void> {
+    // return ymaps3.ready.then(() => { });
+    await ymaps3.ready;
 
-      const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
+    const { YMap, YMapDefaultSchemeLayer, YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
 
-      const mapInstance = new YMap(this.mapContainer().nativeElement, {
-        location: {
-          center: [49.340963, 53.527073],
-          zoom: 18
-        },
-        showScaleInCopyrights: false
-      }, [
-        new YMapDefaultSchemeLayer({}),
-        new YMapFeatureDataSource({ id: 'featureSource', dynamic: false }),
-        new YMapLayer({ type: 'features', source: 'featureSource', zIndex: 1400 }),
-      ]);
+    const mapInstance = new YMap(this.mapContainer().nativeElement, {
+      location: {
+        center: [49.340963, 53.527073],
+        zoom: 18
+      },
+      showScaleInCopyrights: false
+    }, [
+      new YMapDefaultSchemeLayer({}),
+      new YMapFeatureDataSource({ id: 'featureSource', dynamic: false }),
+      new YMapLayer({ type: 'features', source: 'featureSource', zIndex: 1400 }),
+    ]);
 
-      const listener = new YMapListener({
-        onClick: (object: any) => {
-          if (!object) {
-            return
-          }
-
-          const actualResult = this.parkingSlotResponse.get(object.entity.id);
-          if (actualResult) {
-            this._httpClient.get(`${this._baseUrl}/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
-              .subscribe({
-                next: (value) => {
-                  console.log(value)
-                  this._dialog.open(CameraViewComponent, {
-                    maxWidth: '95vw',
-                    maxHeight: '95vh',
-                    panelClass: 'full-screen-modal',
-                    data: { file: value }
-                  });
-                },
-                error: (err) => console.error(err),
-              })
-          }
+    const listener = new YMapListener({
+      onClick: (object: any) => {
+        if (!object) {
+          return
         }
-      });
 
-      mapInstance.addChild(listener);
-
-      this.map.set(mapInstance);
+        const actualResult = this.parkingSlotResponse.get(object.entity.id);
+        if (actualResult) {
+          this._httpClient.get(`${this._baseUrl}/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
+            .subscribe({
+              next: (value) => {
+                console.log(value)
+                this._dialog.open(CameraViewComponent, {
+                  maxWidth: '95vw',
+                  maxHeight: '95vh',
+                  panelClass: 'full-screen-modal',
+                  data: { file: value }
+                });
+              },
+              error: (err) => console.error(err),
+            })
+        }
+      }
     });
+
+    mapInstance.addChild(listener);
+
+    this.map.set(mapInstance);
   }
 
   protected addAllParking() {
