@@ -46,9 +46,9 @@ namespace GreenWoodParking.API.Services
 
         public async Task StartWorkForClient(string connectionId, CancellationToken ct)
         {
-            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", "Работа запущена", ct);
+            await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, "Работа запущена", ct);
 
-            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", "Получение cameras.json", ct);
+            await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, "Получение cameras.json", ct);
             using HttpClient client = _httpClientFactory.CreateClient("CameraDataClient");
             var camerasResponse = await client.GetAsync($"{url}/cameras.json", ct);
             var camerasResponseContent = await camerasResponse.Content.ReadAsStringAsync(ct);
@@ -70,7 +70,7 @@ namespace GreenWoodParking.API.Services
                     var currentCamera = camera;
                     tasks.Add(Task.Run(async () =>
                     {
-                        await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Получение кадров для {currentCamera.Id}", ct);
+                        await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Получение кадров для {currentCamera.Id}", ct);
 
                         var pathToScreenFolderCamera = System.IO.Path.Combine(_pathToScreenFolder, $"{connectionId}", currentCamera.Id);
                         if (!Directory.Exists(pathToScreenFolderCamera))
@@ -87,7 +87,7 @@ namespace GreenWoodParking.API.Services
             }
             else
             {
-                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", "Пустой cameras.json", ct);
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, "Пустой cameras.json", ct);
             }
         }
 
@@ -105,7 +105,7 @@ namespace GreenWoodParking.API.Services
                 if (index >= max)
                     return null;
 
-                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Подключение к камере попытка - {index}", ct);
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Подключение к камере попытка - {index}", ct);
 
                 var cameraVideoUrl = $"{camera.Url}/{playlist}";
 
@@ -118,12 +118,12 @@ namespace GreenWoodParking.API.Services
 
                 //var startTime = DateTime.Now;
                 //double skipSeconds = 1.0;
-                //_hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Ждём: {skipSeconds} сек.");
+                //_hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Ждём: {skipSeconds} сек.");
                 //while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
                 //{
                 //    if (!file.Video.TryGetNextFrame(buffer)) break;
                 //}
-                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Берём фрейм", ct);
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Берём фрейм", ct);
 
                 file.Video.TryGetNextFrame(buffer);
                 var filename = $"{DateTime.Now:yyyyMMddHHmmss}.png";
@@ -134,7 +134,7 @@ namespace GreenWoodParking.API.Services
                 resultBmp.SaveAsJpeg(path);
                 bmp.Dispose();
                 resultBmp.Dispose();
-                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveWorkStatus", $"Фрейм сохранён как: {filename}", ct);
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Фрейм сохранён как: {filename}", ct);
 
                 return filename;
             }
@@ -178,7 +178,7 @@ namespace GreenWoodParking.API.Services
                 result.TotalCount = camera.ParkingSpaces.Count;
                 result.ParkingSlotCount = camera.ParkingSpaces.Count(x => !x.IsOccupied);
 
-                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveParkingData", result, ct);
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveParkingData, result, ct);
             }
         }
 

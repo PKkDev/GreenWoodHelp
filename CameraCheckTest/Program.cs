@@ -17,8 +17,8 @@ namespace CameraCheckTest
     {
         public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\cameraview";
         public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\parkingview";
-        public static string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24", "p25"];
-        //  public static string[] needIds = [ "p28" ];
+        // public static string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24", "p25"];
+        public static string[] needIds = ["p24"];
         public static string url = "https://gw.videosreda.ru";
         public static string playlist = "playlist.m3u8";
 
@@ -221,7 +221,7 @@ namespace CameraCheckTest
             System.IO.DirectoryInfo diImages = new DirectoryInfo(pathToScreenFolder);
             var folders = diImages.GetDirectories();
 
-            foreach (var item in parser.ParkingData)
+            foreach (var item in parser.ParkingData.Where(x => needIds.Contains(x.Id)))
             {
                 Console.WriteLine($"[{item.Id}] Обработка");
 
