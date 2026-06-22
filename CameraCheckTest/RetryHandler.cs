@@ -30,7 +30,7 @@
 
             if (response == null)
             {
-                throw new Exception($"Не удалось распарчить ответ");
+                throw new Exception($"Не удалось распарсить ответ");
             }
 
             return response;

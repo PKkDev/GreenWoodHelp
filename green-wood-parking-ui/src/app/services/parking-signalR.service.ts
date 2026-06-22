@@ -1,8 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import * as signalR from '@microsoft/signalr';
-import { BASE_URL } from './app.config';
-import { ParkingSlotDto } from './parking-slot-dto';
+import { BASE_URL } from '../app.config';
+import { ParkingSlotDto } from '../models/parking-slot-dto';
 
 @Injectable({
   providedIn: 'root'

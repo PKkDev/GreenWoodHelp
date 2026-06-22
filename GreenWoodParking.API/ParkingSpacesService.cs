@@ -21,6 +21,9 @@ namespace GreenWoodParking.API
             Parser.Load("p14", Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "parking", "p14.xml"));
             Parser.Load("p39", Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "parking", "p39.xml"));
             Parser.Load("p40", Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "parking", "p40.xml"));
+            Parser.Load("p37", Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "parking", "p37.xml"));
+            Parser.Load("p38", Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "parking", "p38.xml"));
+            Parser.Load("p24", Path.Combine(AppContext.BaseDirectory, "Assets", "Files", "parking", "p24.xml"));
         }
     }
 }

@@ -38,7 +38,7 @@ namespace GreenWoodParking.API
             builder.Services
                 .AddPredictionEnginePool<Yolo26InputData, Yolo26OutputData>()
                 .FromFile(modelName: "Yolo26m", filePath: "Assets/Files/YoloModel/yolo26m.zip", watchForChanges: true);
-             
+
             // https://github.com/radek-k/FFMediaToolkit#setup
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
