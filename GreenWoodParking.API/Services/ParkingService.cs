@@ -64,12 +64,12 @@ namespace GreenWoodParking.API.Services
 
                 Console.WriteLine($"в cameras.json нужных записей: {camerasNeeded.Count()}/{needIds.Length}");
 
-                List<Task> tasks = [];
+                //List<Task> tasks = [];
                 foreach (var camera in camerasNeeded)
                 {
                     var currentCamera = camera;
-                    tasks.Add(Task.Run(async () =>
-                    {
+                    //tasks.Add(Task.Run(async () =>
+                    //{
                         await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Получение кадров для {currentCamera.Id}", ct);
 
                         var pathToScreenFolderCamera = System.IO.Path.Combine(_pathToScreenFolder, $"{connectionId}", currentCamera.Id);
@@ -81,9 +81,9 @@ namespace GreenWoodParking.API.Services
                         {
                             await CheckParking(connectionId, pathToScreenFolderCamera, filename, currentCamera, ct);
                         }
-                    }, ct));
+                    //}, ct));
                 }
-                Task.WhenAll(tasks).GetAwaiter().GetResult();
+                //Task.WhenAll(tasks).GetAwaiter().GetResult();
             }
             else
             {
