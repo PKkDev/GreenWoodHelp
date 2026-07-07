@@ -17,8 +17,8 @@ namespace CameraCheckTest
     {
         public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\cameraview";
         public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\parkingview";
-        // public static string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24", "p25"];
-        public static string[] needIds = ["p24"];
+        public static string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24", "p25"];
+        // public static string[] needIds = ["p24"];
         public static string url = "https://gw.videosreda.ru";
         public static string playlist = "playlist.m3u8";
 
@@ -159,13 +159,13 @@ namespace CameraCheckTest
                 var buffer = new byte[file.Video.FrameByteCount];
                 var bmp = Image.WrapMemory<Bgr24>(buffer, file.Video.Info.FrameSize.Width, file.Video.Info.FrameSize.Height);
 
-                //var startTime = DateTime.Now;
-                //double skipSeconds = 1.0;
-                //Console.WriteLine($"Ждём: {skipSeconds} сек.");
-                //while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
-                //{
-                //    if (!file.Video.TryGetNextFrame(buffer)) break;
-                //}
+                var startTime = DateTime.Now;
+                double skipSeconds = 1.0;
+                Console.WriteLine($"[{camera.Id}] Ждём {skipSeconds} сек.");
+                while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
+                {
+                    if (!file.Video.TryGetNextFrame(buffer)) break;
+                }
                 Console.WriteLine($"[{camera.Id}] Берём кадр");
 
                 file.Video.TryGetNextFrame(buffer);
@@ -213,7 +213,6 @@ namespace CameraCheckTest
             parser.Load("p14", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p14.xml"));
             parser.Load("p39", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p39.xml"));
             parser.Load("p40", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p40.xml"));
-
             parser.Load("p37", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p37.xml"));
             parser.Load("p38", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p38.xml"));
             parser.Load("p24", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p24.xml"));
