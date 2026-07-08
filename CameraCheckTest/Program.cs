@@ -17,7 +17,8 @@ namespace CameraCheckTest
     {
         public static string pathToScreenFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\cameraview";
         public static string pathToParkingFolder = "D:\\Projects\\GreenWood\\GreenWoodHelp\\FileAssets\\parkingview";
-        public static string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24", "p25"];
+        public static string[] needIds = ["p29", "p28", "p31", "p30", "p21", "p22", "p13", "p14", "p16", "p15", "p39", "p40", "p38", "p37", "p24"];
+        // , "p25"
         // public static string[] needIds = ["p24"];
         public static string url = "https://gw.videosreda.ru";
         public static string playlist = "playlist.m3u8";
