@@ -67,6 +67,7 @@ export class App implements AfterViewInit {
     this.startSignalConnection();
 
     this._parkingSignalRService.receivedStatus$.subscribe((message: string | null) => {
+      
       console.log('ReceiveWorkStatus', message);
       if (message) {
         this._snackBar.open(message, 'Закрыть', {

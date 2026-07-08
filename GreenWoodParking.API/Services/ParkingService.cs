@@ -64,12 +64,12 @@ namespace GreenWoodParking.API.Services
 
                 Console.WriteLine($"в cameras.json нужных записей: {camerasNeeded.Count()}/{needIds.Length}");
 
-                //List<Task> tasks = [];
+                List<Task<(string?, CameraData, string)>> tasks = [];
                 foreach (var camera in camerasNeeded)
                 {
                     var currentCamera = camera;
-                    //tasks.Add(Task.Run(async () =>
-                    //{
+                    tasks.Add(Task.Run(async () =>
+                    {
                         await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Получение кадров для {currentCamera.Id}", ct);
 
                         var pathToScreenFolderCamera = System.IO.Path.Combine(_pathToScreenFolder, $"{connectionId}", currentCamera.Id);
@@ -77,13 +77,44 @@ namespace GreenWoodParking.API.Services
                             Directory.CreateDirectory(pathToScreenFolderCamera);
 
                         var filename = await GetFrameFromCamera(connectionId, currentCamera, pathToScreenFolderCamera, 0, 4, ct);
-                        if (filename != null)
-                        {
-                            await CheckParking(connectionId, pathToScreenFolderCamera, filename, currentCamera, ct);
-                        }
-                    //}, ct));
+                        return (filename, currentCamera, pathToScreenFolderCamera);
+
+                    }, ct));
                 }
-                //Task.WhenAll(tasks).GetAwaiter().GetResult();
+                await Task.WhenAll(tasks);
+
+                foreach (var task in tasks)
+                {
+                    var filename = task.Result.Item1;
+                    var currentCamera = task.Result.Item2;
+                    var pathToScreenFolderCamera = task.Result.Item3;
+
+                    if (!string.IsNullOrEmpty(filename))
+                    {
+                        await CheckParking(connectionId, pathToScreenFolderCamera, filename, currentCamera, ct);
+                    }
+                }
+
+                ////List<Task> tasks = [];
+                //foreach (var camera in camerasNeeded)
+                //{
+                //    var currentCamera = camera;
+                //    //tasks.Add(Task.Run(async () =>
+                //    //{
+                //    await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Получение кадров для {currentCamera.Id}", ct);
+
+                //    var pathToScreenFolderCamera = System.IO.Path.Combine(_pathToScreenFolder, $"{connectionId}", currentCamera.Id);
+                //    if (!Directory.Exists(pathToScreenFolderCamera))
+                //        Directory.CreateDirectory(pathToScreenFolderCamera);
+
+                //    var filename = await GetFrameFromCamera(connectionId, currentCamera, pathToScreenFolderCamera, 0, 4, ct);
+                //    if (filename != null)
+                //    {
+                //        await CheckParking(connectionId, pathToScreenFolderCamera, filename, currentCamera, ct);
+                //    }
+                //    //}, ct));
+                //}
+                ////Task.WhenAll(tasks).GetAwaiter().GetResult();
             }
             else
             {
@@ -116,13 +147,15 @@ namespace GreenWoodParking.API.Services
                 var buffer = new byte[file.Video.FrameByteCount];
                 var bmp = Image.WrapMemory<Bgr24>(buffer, file.Video.Info.FrameSize.Width, file.Video.Info.FrameSize.Height);
 
-                //var startTime = DateTime.Now;
-                //double skipSeconds = 1.0;
-                //_hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Ждём: {skipSeconds} сек.");
-                //while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
-                //{
-                //    if (!file.Video.TryGetNextFrame(buffer)) break;
-                //}
+                #region Wait 1 sec
+                var startTime = DateTime.Now;
+                double skipSeconds = 1.0;
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Ждём: {skipSeconds} сек.");
+                while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
+                {
+                    if (!file.Video.TryGetNextFrame(buffer)) break;
+                }
+                #endregion Wait 1 sec
                 await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Берём фрейм", ct);
 
                 file.Video.TryGetNextFrame(buffer);
