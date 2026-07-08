@@ -216,6 +216,7 @@ namespace CameraCheckTest
             parser.Load("p37", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p37.xml"));
             parser.Load("p38", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p38.xml"));
             parser.Load("p24", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p24.xml"));
+            //parser.Load("p25", System.IO.Path.Combine(Environment.CurrentDirectory, "Files", "p25.xml"));
 
             System.IO.DirectoryInfo diImages = new DirectoryInfo(pathToScreenFolder);
             var folders = diImages.GetDirectories();
