@@ -20,14 +20,16 @@ export class CameraViewComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   public imagePath = signal<SafeUrl | undefined>(undefined);
 
+  private objectUrl: string | undefined;
+
   public ngOnInit(): void {
-    const unsafeUrl = URL.createObjectURL(this.data.file);
-    this.imagePath.set(this.sanitizer.bypassSecurityTrustUrl(unsafeUrl));
+    this.objectUrl = URL.createObjectURL(this.data.file);
+    this.imagePath.set(this.sanitizer.bypassSecurityTrustUrl(this.objectUrl));
   }
 
   public ngOnDestroy(): void {
-    if (this.imagePath) {
-      URL.revokeObjectURL(this.imagePath() as string);
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
     }
   }
 
