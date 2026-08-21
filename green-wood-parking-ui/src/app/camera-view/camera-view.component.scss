@@ -10,4 +10,31 @@
     max-width: 100%;
     max-height: 95vh;
   }
+
+  .refresh-button {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10;
+
+    // хороший размер тач-таргета для телефона (стандартный mat-fab уже 56px)
+    &[disabled] {
+      opacity: 0.7;
+    }
+  }
+
+  .error-banner {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 32px);
+    background: rgba(211, 47, 47, 0.95);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+    z-index: 10;
+  }
 }

@@ -7,7 +7,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterOutlet } from '@angular/router';
 import { HubConnectionState } from '@microsoft/signalr';
 import { CameraViewComponent } from './camera-view/camera-view.component';
+import type { CameraViewData } from './camera-view/camera-view.component';
 import { EventLogComponent } from './event-log/event-log.component';
+import { Observable } from 'rxjs';
 
 
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
@@ -129,19 +131,24 @@ export class App implements AfterViewInit {
 
         const actualResult = this.parkingSlotResponse.get(object.entity.id);
         if (actualResult) {
-          this._httpClient.get(`${this._baseUrl}/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
-            .subscribe({
-              next: (value) => {
-                console.log(value)
-                this._dialog.open(CameraViewComponent, {
-                  maxWidth: '95vw',
-                  maxHeight: '95vh',
-                  panelClass: 'full-screen-modal',
-                  data: { file: value }
-                });
-              },
-              error: (err) => console.error(err),
-            })
+          const slotId = object.entity.id;
+
+          const fetchImage = (): Observable<Blob> => {
+            const latest = this.parkingSlotResponse.get(slotId) ?? actualResult;
+            return this._httpClient.get(`${this._baseUrl}/file-view/camera/${latest.imgUrl}`, { responseType: 'blob' });
+          };
+
+          fetchImage().subscribe({
+            next: (value) => {
+              this._dialog.open(CameraViewComponent, {
+                maxWidth: '95vw',
+                maxHeight: '95vh',
+                panelClass: 'full-screen-modal',
+                data: { file: value, fetchImage } as CameraViewData
+              });
+            },
+            error: (err) => console.error(err),
+          })
         }
       }
     });
