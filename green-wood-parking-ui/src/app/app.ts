@@ -6,10 +6,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterOutlet } from '@angular/router';
 import { HubConnectionState } from '@microsoft/signalr';
-import { CameraViewComponent } from './camera-view/camera-view.component';
-import type { CameraViewData } from './camera-view/camera-view.component';
-import { EventLogComponent } from './event-log/event-log.component';
 import { Observable } from 'rxjs';
+import type { CameraViewData } from './camera-view/camera-view.component';
+import { CameraViewComponent } from './camera-view/camera-view.component';
+import { EventLogComponent } from './event-log/event-log.component';
 
 
 import type { YMapFeature as YMapFeatureType, YMap as YMapType } from '@yandex/ymaps3-types';
@@ -61,6 +61,7 @@ export class App implements AfterViewInit {
     this.parkingSlotMap.set('p25', parkingSLots['p25']);
   }
 
+
   public ngAfterViewInit() {
     this.title.set('green-wood-parking-ui');
 
@@ -69,7 +70,7 @@ export class App implements AfterViewInit {
     this.startSignalConnection();
 
     this._parkingSignalRService.receivedStatus$.subscribe((message: string | null) => {
-      
+
       console.log('ReceiveWorkStatus', message);
       if (message) {
         this._snackBar.open(message, 'Закрыть', {
