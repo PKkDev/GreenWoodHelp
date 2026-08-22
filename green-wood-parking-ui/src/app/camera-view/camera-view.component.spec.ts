@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { of, Subject, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { CameraViewComponent, CameraViewData } from './camera-view.component';
 
 describe('CameraViewComponent', () => {
   let component: CameraViewComponent;
   let fixture: ComponentFixture<CameraViewComponent>;
   let mockDialogRef: MatDialogRef<CameraViewComponent>;
-  let fetchImage: ReturnType<typeof vi.fn>;
+  let fetchImage: ReturnType<typeof vi.fn<() => Observable<Blob>>>;
   const initialFile = new Blob(['initial'], { type: 'image/jpeg' });
   const refreshedFile = new Blob(['refreshed'], { type: 'image/jpeg' });
   let objectUrlCounter = 0;
@@ -34,31 +34,47 @@ describe('CameraViewComponent', () => {
       close: vi.fn()
     } as unknown as MatDialogRef<CameraViewComponent>;
 
-    fetchImage = vi.fn().mockReturnValue(of(refreshedFile));
+    fetchImage = vi.fn<() => Observable<Blob>>()
+      .mockReturnValueOnce(of(initialFile))
+      .mockReturnValue(of(refreshedFile));
   });
 
   it('should create', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
     expect(component).toBeTruthy();
   });
 
   it('should not render the image before ngOnInit runs', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
 
     const img: HTMLImageElement | null = fixture.nativeElement.querySelector('img.parking-frame');
     expect(img).toBeFalsy();
   });
 
-  it('should create an object URL from the initial file on init', () => {
-    createComponent({ file: initialFile, fetchImage });
+  it('should show a loading indicator until the initial image arrives', () => {
+    fetchImage.mockReset().mockReturnValue(new Subject());
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
+    expect(component.isLoading()).toBe(true);
+    const img: HTMLImageElement | null = fixture.nativeElement.querySelector('img.parking-frame');
+    expect(img).toBeFalsy();
+    const overlay = fixture.nativeElement.querySelector('.loading-overlay');
+    expect(overlay).toBeTruthy();
+  });
+
+  it('should fetch the initial image on init', () => {
+    createComponent({ fetchImage });
+    fixture.detectChanges();
+
+    expect(fetchImage).toHaveBeenCalledTimes(1);
     expect(URL.createObjectURL).toHaveBeenCalledWith(initialFile);
     expect(component.imagePath()).toBeTruthy();
+    expect(component.isLoading()).toBe(false);
   });
 
   it('should render the image once the safe url is available', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     const img: HTMLImageElement | null = fixture.nativeElement.querySelector('img.parking-frame');
@@ -66,7 +82,7 @@ describe('CameraViewComponent', () => {
   });
 
   it('should close the dialog when the image is clicked', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     const img: HTMLImageElement = fixture.nativeElement.querySelector('img.parking-frame');
@@ -76,7 +92,7 @@ describe('CameraViewComponent', () => {
   });
 
   it('should close the dialog when onClose is called directly', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
 
     component.onClose();
 
@@ -84,7 +100,7 @@ describe('CameraViewComponent', () => {
   });
 
   it('should revoke the object URL on destroy', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     const firstUrl = 'blob:http://localhost/1';
@@ -94,19 +110,19 @@ describe('CameraViewComponent', () => {
   });
 
   it('should fetch a new image and replace the current one when refresh is triggered', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     component.onRefresh();
 
-    expect(fetchImage).toHaveBeenCalled();
+    expect(fetchImage).toHaveBeenCalledTimes(2);
     expect(URL.createObjectURL).toHaveBeenCalledWith(refreshedFile);
     expect(component.isRefreshing()).toBe(false);
     expect(component.error()).toBeNull();
   });
 
   it('should revoke the previous object URL after a successful refresh', () => {
-    createComponent({ file: initialFile, fetchImage });
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     const firstUrl = 'blob:http://localhost/1';
@@ -116,8 +132,8 @@ describe('CameraViewComponent', () => {
   });
 
   it('should disable the refresh button while a refresh is in flight', () => {
-    fetchImage.mockReturnValue(new Subject());
-    createComponent({ file: initialFile, fetchImage });
+    fetchImage.mockReset().mockReturnValueOnce(of(initialFile)).mockReturnValue(new Subject());
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     component.onRefresh();
@@ -129,19 +145,19 @@ describe('CameraViewComponent', () => {
   });
 
   it('should not start a second refresh while one is already in flight', () => {
-    fetchImage.mockReturnValue(new Subject());
-    createComponent({ file: initialFile, fetchImage });
+    fetchImage.mockReset().mockReturnValueOnce(of(initialFile)).mockReturnValue(new Subject());
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     component.onRefresh();
     component.onRefresh();
 
-    expect(fetchImage).toHaveBeenCalledTimes(1);
+    expect(fetchImage).toHaveBeenCalledTimes(2);
   });
 
   it('should surface an error message and keep the previous image if refresh fails', () => {
-    fetchImage.mockReturnValue(throwError(() => new Error('network error')));
-    createComponent({ file: initialFile, fetchImage });
+    fetchImage.mockReset().mockReturnValueOnce(of(initialFile)).mockReturnValue(throwError(() => new Error('network error')));
+    createComponent({ fetchImage });
     fixture.detectChanges();
 
     const pathBeforeRefresh = component.imagePath();
@@ -150,5 +166,15 @@ describe('CameraViewComponent', () => {
     expect(component.isRefreshing()).toBe(false);
     expect(component.error()).toBeTruthy();
     expect(component.imagePath()).toBe(pathBeforeRefresh);
+  });
+
+  it('should surface an error and stop loading if the initial fetch fails', () => {
+    fetchImage.mockReset().mockReturnValue(throwError(() => new Error('network error')));
+    createComponent({ fetchImage });
+    fixture.detectChanges();
+
+    expect(component.isLoading()).toBe(false);
+    expect(component.error()).toBeTruthy();
+    expect(component.imagePath()).toBeUndefined();
   });
 });

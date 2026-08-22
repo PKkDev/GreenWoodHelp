@@ -3,12 +3,18 @@
     <img class="parking-frame" [src]="imagePath()" alt="Parking Stream" (click)="onClose()" />
   }
 
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
   <button
     mat-fab
     color="primary"
     type="button"
     class="refresh-button"
-    [disabled]="isRefreshing()"
+    [disabled]="isRefreshing() || isLoading()"
     (click)="onRefresh(); $event.stopPropagation()"
     aria-label="Обновить изображение"
   >

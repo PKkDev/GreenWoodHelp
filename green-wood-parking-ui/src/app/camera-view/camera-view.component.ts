@@ -8,9 +8,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 
 export interface CameraViewData {
-  /** Первый кадр, уже загруженный к моменту открытия диалога. */
-  file: Blob;
-  /** Запрашивает актуальный кадр заново (используется кнопкой обновления). */
+  /** Запрашивает кадр (используется при открытии диалога и кнопкой обновления). */
   fetchImage: () => Observable<Blob>;
 }
 
@@ -29,13 +27,24 @@ export class CameraViewComponent implements OnInit, OnDestroy {
   private readonly sanitizer = inject(DomSanitizer);
 
   public imagePath = signal<SafeUrl | undefined>(undefined);
+  public isLoading = signal(true);
   public isRefreshing = signal(false);
   public error = signal<string | null>(null);
 
   private objectUrl: string | undefined;
 
   public ngOnInit(): void {
-    this.setImage(this.data.file);
+    this.data.fetchImage().subscribe({
+      next: (blob) => {
+        this.setImage(blob);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.error.set('Не удалось загрузить изображение');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   public ngOnDestroy(): void {
@@ -47,7 +56,7 @@ export class CameraViewComponent implements OnInit, OnDestroy {
   }
 
   public onRefresh(): void {
-    if (this.isRefreshing()) {
+    if (this.isRefreshing() || this.isLoading()) {
       return;
     }
 

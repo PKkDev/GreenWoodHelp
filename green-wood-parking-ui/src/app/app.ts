@@ -138,17 +138,12 @@ export class App implements AfterViewInit {
             return this._httpClient.get(`${this._baseUrl}/file-view/camera/${latest.imgUrl}`, { responseType: 'blob' });
           };
 
-          fetchImage().subscribe({
-            next: (value) => {
-              this._dialog.open(CameraViewComponent, {
-                maxWidth: '95vw',
-                maxHeight: '95vh',
-                panelClass: 'full-screen-modal',
-                data: { file: value, fetchImage } as CameraViewData
-              });
-            },
-            error: (err) => console.error(err),
-          })
+          this._dialog.open(CameraViewComponent, {
+            maxWidth: '95vw',
+            maxHeight: '95vh',
+            panelClass: 'full-screen-modal',
+            data: { fetchImage } as CameraViewData
+          });
         }
       }
     });
