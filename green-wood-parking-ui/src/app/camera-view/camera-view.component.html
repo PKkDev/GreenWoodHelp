@@ -2,4 +2,30 @@
   @if (imagePath()) {
     <img class="parking-frame" [src]="imagePath()" alt="Parking Stream" (click)="onClose()" />
   }
+
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  <button
+    mat-fab
+    color="primary"
+    type="button"
+    class="refresh-button"
+    [disabled]="isRefreshing() || isLoading()"
+    (click)="onRefresh(); $event.stopPropagation()"
+    aria-label="Обновить изображение"
+  >
+    @if (isRefreshing()) {
+      <mat-spinner diameter="24" color="accent"></mat-spinner>
+    } @else {
+      <mat-icon>refresh</mat-icon>
+    }
+  </button>
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
 </div>

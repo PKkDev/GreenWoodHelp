@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterOutlet } from '@angular/router';
 import { HubConnectionState } from '@microsoft/signalr';
+import { Observable } from 'rxjs';
+import type { CameraViewData } from './camera-view/camera-view.component';
 import { CameraViewComponent } from './camera-view/camera-view.component';
 import { EventLogComponent } from './event-log/event-log.component';
 
@@ -59,6 +61,7 @@ export class App implements AfterViewInit {
     this.parkingSlotMap.set('p25', parkingSLots['p25']);
   }
 
+
   public ngAfterViewInit() {
     this.title.set('green-wood-parking-ui');
 
@@ -67,7 +70,7 @@ export class App implements AfterViewInit {
     this.startSignalConnection();
 
     this._parkingSignalRService.receivedStatus$.subscribe((message: string | null) => {
-      
+
       console.log('ReceiveWorkStatus', message);
       if (message) {
         this._snackBar.open(message, 'Закрыть', {
@@ -129,19 +132,19 @@ export class App implements AfterViewInit {
 
         const actualResult = this.parkingSlotResponse.get(object.entity.id);
         if (actualResult) {
-          this._httpClient.get(`${this._baseUrl}/file-view/camera/${actualResult.imgUrl}`, { responseType: 'blob' })
-            .subscribe({
-              next: (value) => {
-                console.log(value)
-                this._dialog.open(CameraViewComponent, {
-                  maxWidth: '95vw',
-                  maxHeight: '95vh',
-                  panelClass: 'full-screen-modal',
-                  data: { file: value }
-                });
-              },
-              error: (err) => console.error(err),
-            })
+          const slotId = object.entity.id;
+
+          const fetchImage = (): Observable<Blob> => {
+            const latest = this.parkingSlotResponse.get(slotId) ?? actualResult;
+            return this._httpClient.get(`${this._baseUrl}/file-view/camera/${latest.imgUrl}`, { responseType: 'blob' });
+          };
+
+          this._dialog.open(CameraViewComponent, {
+            maxWidth: '95vw',
+            maxHeight: '95vh',
+            panelClass: 'full-screen-modal',
+            data: { fetchImage } as CameraViewData
+          });
         }
       }
     });
