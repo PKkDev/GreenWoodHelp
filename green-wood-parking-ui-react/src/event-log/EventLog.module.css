@@ -1,0 +1,29 @@
+.title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.eventList {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 4px;
+}
+
+.eventItem {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.eventTime {
+  font-weight: bold;
+  color: #666;
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+.eventMessage {
+  word-break: break-word;
+}

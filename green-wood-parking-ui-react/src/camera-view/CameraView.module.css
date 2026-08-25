@@ -1,0 +1,57 @@
+.panel {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: 95vw;
+  max-height: 95vh;
+  overflow: hidden;
+}
+
+.viewer {
+  position: relative;
+  background-color: #2c2c2c;
+  line-height: 0;
+  min-width: 320px;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 95vh;
+  cursor: pointer;
+}
+
+.loadingOverlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.refreshButton {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+}
+
+.errorBanner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  background: rgba(211, 47, 47, 0.95);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  z-index: 10;
+}

@@ -1,0 +1,31 @@
+.map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.toolBar {
+  padding: 10px 0;
+  position: absolute;
+  bottom: 0;
+  background: #eee;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.statusConnected {
+  background-color: #2e7d32 !important;
+  color: white !important;
+}
+
+.statusDisconnected {
+  background-color: #d32f2f !important;
+  color: white !important;
+}
