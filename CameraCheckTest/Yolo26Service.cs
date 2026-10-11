@@ -1,4 +1,5 @@
 ﻿using GreenWoodParking.Shared;
+using GreenWoodParking.Shared.CVAT.Model;
 using Microsoft.ML;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -6,8 +7,6 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System.Net;
-using YOLO26.Shared.CvatWorker.Model;
 using YOLO26.Shared.YOLOWorker.DataStructures;
 
 namespace ObjectDetection.WinApp.Services

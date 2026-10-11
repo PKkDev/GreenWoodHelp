@@ -3,14 +3,14 @@ using GreenWoodParking.API.DTO;
 using GreenWoodParking.API.Hubs;
 using GreenWoodParking.API.Model;
 using GreenWoodParking.Shared;
+using GreenWoodParking.Shared.CVAT.Model;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using YOLO26.Shared.CvatWorker.Model;
+using SixLabors.ImageSharp.Processing; 
 
 namespace GreenWoodParking.API.Services
 {

@@ -1,6 +1,7 @@
 ﻿using CameraCheckTest.Model;
 using FFMediaToolkit;
 using FFMediaToolkit.Decoding;
+using GreenWoodParking.Shared.CVAT;
 using Newtonsoft.Json;
 using ObjectDetection.WinApp.Services;
 using OpenQA.Selenium;
@@ -8,8 +9,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using YOLO26.Shared.CvatWorker;
+using SixLabors.ImageSharp.Processing; 
 
 namespace CameraCheckTest
 {
