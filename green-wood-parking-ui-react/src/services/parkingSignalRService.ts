@@ -55,7 +55,16 @@ class ParkingSignalRService {
         const message = err instanceof Error ? err.message : String(err);
         this.statusListeners.forEach((listener) => { listener(message); });
       });
+  }
 
+  public invokeGetParkingData(): void {
+    this.hubConnection.invoke('GetParkingData').catch((err: unknown) => {
+      console.error('SignalR invoke Error: ', err);
+    });
+  }
+
+  // Подписки регистрируются один раз, иначе повторный startConnection() дублирует обработчики
+  private setupSignalRListeners(): void {
     this.hubConnection.on('ReceiveWorkStatus', (data: string) => {
       this.statusListeners.forEach((listener) => { listener(data); });
     });
@@ -63,16 +72,14 @@ class ParkingSignalRService {
     this.hubConnection.on('ReceiveParkingData', (data: ParkingSlotDto) => {
       this.parkingDataListeners.forEach((listener) => { listener(data); });
     });
-  }
 
-  public invokeGetParkingData(): void {
-    void this.hubConnection.invoke('GetParkingData');
-  }
-
-  private setupSignalRListeners(): void {
     this.hubConnection.onclose(() => { this.setConnected(false); });
     this.hubConnection.onreconnecting(() => { this.setConnected(false); });
-    this.hubConnection.onreconnected(() => { this.setConnected(true); });
+    this.hubConnection.onreconnected(() => {
+      this.setConnected(true);
+      // После переподключения у сервера новый connectionId, поэтому запрашиваем данные заново
+      this.invokeGetParkingData();
+    });
   }
 
   private setConnected(value: boolean): void {

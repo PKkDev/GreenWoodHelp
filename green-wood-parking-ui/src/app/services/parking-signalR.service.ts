@@ -35,7 +35,20 @@ export class ParkingSignalRService {
     // Обновляем сигнал при смене состояний
     this.hubConnection.onclose(() => this._isConnected.set(false));
     this.hubConnection.onreconnecting(() => this._isConnected.set(false));
-    this.hubConnection.onreconnected(() => this._isConnected.set(true));
+    this.hubConnection.onreconnected(() => {
+      this._isConnected.set(true);
+      // После переподключения у сервера новый connectionId, поэтому запрашиваем данные заново
+      this.invokeGetParkingData();
+    });
+
+    // Подписки регистрируются один раз, иначе повторный startConnection() дублирует обработчики
+    this.hubConnection.on('ReceiveWorkStatus', (data: any) => {
+      this.receivedStatus.set(data);
+    });
+
+    this.hubConnection.on('ReceiveParkingData', (data: ParkingSlotDto) => {
+      this.receiveParkingData.set(data);
+    });
   }
 
   public startConnection() {
@@ -52,15 +65,6 @@ export class ParkingSignalRService {
         this._isConnected.set(false);
         this.receivedStatus.set(err.message);
       });
-
-    // Слушаем событие от бэкенда
-    this.hubConnection.on('ReceiveWorkStatus', (data: any) => {
-      this.receivedStatus.set(data);
-    });
-
-    this.hubConnection.on('ReceiveParkingData', (data: ParkingSlotDto) => {
-      this.receiveParkingData.set(data);
-    });
   }
 
   public invokeGetParkingData() {

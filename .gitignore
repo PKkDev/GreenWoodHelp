@@ -435,8 +435,8 @@ test-results/
 .AppleDouble
 .LSOverride
 
-# Icon must end with two \r
-Icon
+# The macOS "Icon\r" rule is intentionally omitted: without the trailing \r
+# characters it ignores every file or folder named Icon (e.g. src/components/Icon).
 
 
 # Thumbnails

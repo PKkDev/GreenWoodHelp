@@ -25,6 +25,11 @@ namespace GreenWoodParking.API.Services
         private readonly string url = "https://gw.videosreda.ru";
         private readonly string playlist = "playlist.m3u8";
 
+        private const int MaxFrameAttempts = 4;
+        private const int MaxSkippedFrames = 300; // защита от потока без корректных timestamp
+        private static readonly TimeSpan FrameRetryDelay = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan SkipDuration = TimeSpan.FromSeconds(1);
+
         private readonly string _pathToScreenFolder;
 
         private readonly ParkingSpacesService _parkingSpacesService;
@@ -50,7 +55,12 @@ namespace GreenWoodParking.API.Services
 
             await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, "Получение cameras.json", ct);
             using HttpClient client = _httpClientFactory.CreateClient("CameraDataClient");
-            var camerasResponse = await client.GetAsync($"{url}/cameras.json", ct);
+            using var camerasResponse = await client.GetAsync($"{url}/cameras.json", ct);
+            if (!camerasResponse.IsSuccessStatusCode)
+            {
+                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Ошибка получения cameras.json: {(int)camerasResponse.StatusCode}", ct);
+                return;
+            }
             var camerasResponseContent = await camerasResponse.Content.ReadAsStringAsync(ct);
             var cameras = JsonConvert.DeserializeObject<GreenWoodCameras>(camerasResponseContent);
 
@@ -76,7 +86,7 @@ namespace GreenWoodParking.API.Services
                         if (!Directory.Exists(pathToScreenFolderCamera))
                             Directory.CreateDirectory(pathToScreenFolderCamera);
 
-                        var filename = await GetFrameFromCamera(connectionId, currentCamera, pathToScreenFolderCamera, 0, 4, ct);
+                        var filename = await GetFrameFromCamera(connectionId, currentCamera, pathToScreenFolderCamera, ct);
                         return (filename, currentCamera, pathToScreenFolderCamera);
 
                     }, ct));
@@ -126,56 +136,75 @@ namespace GreenWoodParking.API.Services
             string connectionId,
             CameraData camera,
             string pathToScreenFolderCamera,
-            int index, int max,
             CancellationToken ct)
         {
-            ct.ThrowIfCancellationRequested();
-
-            try
+            for (int attempt = 1; attempt <= MaxFrameAttempts; attempt++)
             {
-                if (index >= max)
-                    return null;
+                ct.ThrowIfCancellationRequested();
 
-                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Подключение к камере попытка - {index}", ct);
-
-                var cameraVideoUrl = $"{camera.Url}/{playlist}";
-
-                var options = new MediaOptions() { VideoPixelFormat = FFMediaToolkit.Graphics.ImagePixelFormat.Rgb24, };
-                using var file = MediaFile.Open(cameraVideoUrl);
-                var video = file.Video;
-
-                var buffer = new byte[file.Video.FrameByteCount];
-                var bmp = Image.WrapMemory<Bgr24>(buffer, file.Video.Info.FrameSize.Width, file.Video.Info.FrameSize.Height);
-
-                #region Wait 1 sec
-                var startTime = DateTime.Now;
-                double skipSeconds = 1.0;
-                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Ждём: {skipSeconds} сек.");
-                while ((DateTime.Now - startTime).TotalSeconds < skipSeconds)
+                try
                 {
-                    if (!file.Video.TryGetNextFrame(buffer)) break;
+                    await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Подключение к камере {camera.Id} попытка - {attempt}/{MaxFrameAttempts}", ct);
+
+                    return await SaveFrameFromCamera(connectionId, camera, pathToScreenFolderCamera, ct);
                 }
-                #endregion Wait 1 sec
-                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Берём фрейм", ct);
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Получение кадров ошибка ({camera.Id}, попытка {attempt}) - {ex}");
 
-                file.Video.TryGetNextFrame(buffer);
-                var filename = $"{DateTime.Now:yyyyMMddHHmmss}.png";
-
-                var path = System.IO.Path.Combine(pathToScreenFolderCamera, filename);
-                using var resultBmp = bmp.Clone();
-                resultBmp.Mutate(x => x.Resize(1080, 864, KnownResamplers.Lanczos3));
-                resultBmp.SaveAsJpeg(path);
-                bmp.Dispose();
-                resultBmp.Dispose();
-                await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Фрейм сохранён как: {filename}", ct);
-
-                return filename;
+                    if (attempt < MaxFrameAttempts)
+                        await Task.Delay(FrameRetryDelay * attempt, ct);
+                }
             }
-            catch (Exception ex)
+
+            return null;
+        }
+
+        private async Task<string> SaveFrameFromCamera(
+            string connectionId,
+            CameraData camera,
+            string pathToScreenFolderCamera,
+            CancellationToken ct)
+        {
+            var cameraVideoUrl = $"{camera.Url}/{playlist}";
+
+            var options = new MediaOptions() { VideoPixelFormat = FFMediaToolkit.Graphics.ImagePixelFormat.Rgb24, };
+            using var file = MediaFile.Open(cameraVideoUrl, options);
+            var video = file.Video;
+
+            var buffer = new byte[video.FrameByteCount];
+            if (!video.TryGetNextFrame(buffer))
+                throw new InvalidOperationException($"Не удалось прочитать первый кадр с камеры {camera.Id}");
+
+            #region Skip 1 sec
+            // Первые кадры HLS часто битые/серые, поэтому пропускаем SkipDuration по timestamp кадров
+            await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Ждём: {SkipDuration.TotalSeconds} сек.", ct);
+            var startPosition = video.Position;
+            int skippedFrames = 0;
+            while (video.Position - startPosition < SkipDuration && skippedFrames < MaxSkippedFrames)
             {
-                Console.WriteLine($"Получение кадров ошибка - {ex}");
-                return await GetFrameFromCamera(connectionId, camera, pathToScreenFolderCamera, ++index, max, ct);
+                ct.ThrowIfCancellationRequested();
+                if (!video.TryGetNextFrame(buffer)) break;
+                skippedFrames++;
             }
+            #endregion Skip 1 sec
+
+            await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Берём фрейм", ct);
+
+            var filename = $"{DateTime.Now:yyyyMMddHHmmss}.png";
+            var path = System.IO.Path.Combine(pathToScreenFolderCamera, filename);
+
+            using var image = Image.LoadPixelData<Rgb24>(buffer, video.Info.FrameSize.Width, video.Info.FrameSize.Height);
+            image.Mutate(x => x.Resize(1080, 864, KnownResamplers.Lanczos3));
+            await image.SaveAsPngAsync(path, ct);
+
+            await _hubContext.Clients.Client(connectionId).SendAsync(SignalMethods.ReceiveWorkStatus, $"Фрейм сохранён как: {filename}", ct);
+
+            return filename;
         }
 
         private async Task CheckParking(

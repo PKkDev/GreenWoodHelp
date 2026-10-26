@@ -27,9 +27,9 @@ namespace GreenWoodParking.API
 
             builder.Services.AddSignalR();
 
-            builder.Services.AddScoped<RetryHandler>();
+            // Повторы с экспоненциальной задержкой, таймауты и circuit breaker
             builder.Services.AddHttpClient("CameraDataClient")
-                .AddHttpMessageHandler(provider => provider.GetRequiredService<RetryHandler>());
+                .AddStandardResilienceHandler();
 
             builder.Services.AddSingleton<ParkingSpacesService>();
             builder.Services.AddScoped<ParkingService>();
